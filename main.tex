@@ -1,0 +1,27 @@
+\documentclass{report}
+\input{~/studies/preamble}
+\usepackage[style=authoryear, backend=biber]{biblatex}
+\usepackage{tocloft}
+\addbibresource{references.bib}
+\setlength{\cftbeforesecskip}{0.3em}
+\setcounter{tocdepth}{1}
+
+\title{Reinforcement Learning}
+\author{Hyoung Joon, Kim}
+\date{\today}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\part{Algorithms}
+    \chapter{Introduction}
+    \chapter{Value-based Methods}
+    \chapter{Policy-based Methods}
+    \chapter{Model-based Methods}
+\part{Theories}
+    \chapter{Introduction}
+
+\printbibliography
+\end{document}
