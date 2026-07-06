@@ -1,0 +1,95 @@
+\section{Introduction}
+The \textbf{Bellman equation} is the heart of reinforcement learning.
+All reinforcement learning algorithms are designed to solve this equation.
+\section{Bellman Equation}
+    \subsection{State-value Function}
+        Before diving into the Bellman equation, we introduce an important concept called the \textbf{value of a state}.
+        \begin{defn}{State Value}{state-value}
+            Let the agent follows the policy $\pi$. The \textbf{state value} $v_\pi(s)$ of state $s$ is defined as the expected return:
+            \begin{equation}
+                v_\pi(s) = \E[G_t|S_t=s] \label{eq:state-value}
+            \end{equation}
+            where $G_t$ is the discounted return $G_t=\sum_{k=t+1}^{\infty}\gamma^{k-t-1}R_{k}$.
+            The function $v_\pi$ itself is called \textbf{state-value function}.
+        \end{defn}
+        State values are used to evaluate the policy $\pi$. Policies that generate greater state values are better. Then, how can we
+        obtain te state values? The answer is to solve the Bellman equation.
+    \subsection{Bellman Equation for State-Value Function}
+        The Bellman equation is simply a set of linear equations that describe the relationships of each state values.
+        Bellman equation can be obtained by using the recursive property of return:
+        \begin{align}
+            G_t &= R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + \gamma^3 R_{t+4} + \cdots \\
+                &= R_{t+1} + \gamma (R_{t+2} + \gamma R_{t+3} + \gamma^2 R_{t+4}) + \cdots \\
+                &= R_{t+1} + \gamma G_{t+1}.
+        \end{align}
+        Substituting equation \ref{eq:state-value} with the recursive realationship, we obtain
+        \begin{align}
+            v_\pi(s) &= \E[G_t|S_t=s] \\
+                     &= \E[R_{t+1} + \gamma G_{t+1}|S_t=s] \\
+                     &= \E[R_{t+1}|S_t=s] + \gamma \E[G_{t+1}|S_t=s]
+        \end{align} 
+        Using the law of total expectation, we get
+        \begin{align}
+            \E[R_{t+1}|S_t=s] &= \sum_{a \in \mathcal{A}(s)}\pi(a|s)\E[R_{t+1}|S_t=s,A_t=a] \\
+                              &= \sum_{a \in \mathcal{A}(s)}\pi(a|s)\sum_{r \in \mathcal{R}(s,a)}p(r|s,a)r
+        \end{align}
+        and
+        \begin{align}
+            \E[G_{t+1}|S_t=s] &= \sum_{s' \in \mathcal{S}}\E[G_{t+1}|S_{t+1}=s',S_t=s]p(s'|s) \\
+                              &= \sum_{s' \in \mathcal{S}}\E[G_{t+1}|S_{t+1}=s']p(s'|s) \quad \text{(Markov property)} \\
+                              &= \sum_{s' \in \mathcal{S}}v_\pi(s')p(s'|s) \\
+                              &= \sum_{s' \in \mathcal{S}}v_\pi(s')\sum_{a \in \mathcal{A}(s)}p(s'|s,a).
+        \end{align}
+        The final result is given in the following box:
+        \begin{thm}{Bellman Equation for State-Value Function}{BellmanEq-SV}
+            Let $\pi$ be a policy, and let $v_\pi$ be a state-value function. Then, the following Bellman equation is satisfied:
+            \begin{equation}
+                v_\pi(s) = \sum_{a \in \mathcal{A}(s)}\pi(a|s)\sum_{s' \in \mathcal{S}}\sum_{r \in \mathcal{R}(s,a)}p(s',r|s,a)\big[ r + \gamma v_\pi(s') \big]
+            \end{equation}
+        \end{thm}
+    \subsection{Matrix-Vector form of Bellman Equation}
+        We can reformulate Bellman equation in terms of matrix-vector form. For this, we rewrite the Bellman equation given in Theorem \ref{thm:BellmanEq-SV} as
+        \begin{equation}
+            v_\pi(s) = r_\pi(s) + \gamma\sum_{s' \in \mathcal{S}}p_\pi(s'|s)v_\pi(s'),
+        \end{equation}
+        where
+        \begin{align}
+            r_\pi(s) &= \sum_{a \in \mathcal{A}(s)}\pi(a|s)\sum_{r \in \mathcal{R}(s,a)}p(r|s,a)r \\
+            p_\pi(s'|s) &= \sum_{a \in \mathcal{A}(s)}\pi(a|s)p(s'|s,a).
+        \end{align}
+        The $r_\pi$ and $p_\pi$ denotes the mean of immediate rewards and probability of transitioning from $s$ to $s'$ under policy $\pi$, respectively.
+        Suppose that we indexed all states as $s_i$ with $i = 1, \dots, n$, where $n=|\mathcal{S}|$.
+        Let
+        \begin{equation}
+            v_\pi = \begin{bmatrix}
+                    v_\pi(s_1) \\
+                    \vdots \\
+                    v_\pi(s_n)
+                    \end{bmatrix},
+            r_\pi = \begin{bmatrix}
+                    r_\pi(s_1) \\
+                    \vdots \\
+                    r_\pi(s_n)
+                    \end{bmatrix},
+            P_\pi = \begin{bmatrix}
+                    p_\pi(s_1|s_1) & p_\pi(s_2|s_1) & \dots & p_\pi(s_n|s_1) \\
+                    p_\pi(s_1|s_2) & p_\pi(s_2|s_2) & \dots & p_\pi(s_n|s_2) \\
+                    \vdots & \vdots &  & \vdots \\
+                    p_\pi(s_1|s_n) & p_\pi(s_2|s_n) & \dots & p_\pi(s_n|s_n)
+                    \end{bmatrix}. \label{eq:VecForm}
+        \end{equation}
+        Then, Theorem \ref{thm:BellmanEq-SV} can be written in the following form:
+        \begin{thm}{Matrix-Vector form of Bellman Equation}{MVFormBellmanEq}
+        Let $v_\pi$, $r_\pi$ and $P_\pi$ be given as \ref{eq:VecForm}. Then, following is satisfied:
+            \begin{equation}
+                v_\pi = r_\pi + \gamma P_\pi v_\pi
+            \end{equation}
+        \end{thm}
+        \begin{rem}{Properties of Matrix $P_\pi$}{ProbMatProp}
+            Note that the matrix $P_\pi$ given in equation \ref{eq:VecForm} satisfies following properties:
+            \begin{itemize}
+                \item All the elements are nonnegative;
+                \item The sum of the values of every row equals 1. Matrix with this property is called a \emph{stochastic matrix}.
+            \end{itemize}
+        \end{rem}
+    \section{Solving the Bellman Equation}

@@ -1,6 +1,6 @@
 \documentclass{report}
-\input{~/studies/preamble}
-\usepackage[style=authoryear, backend=biber]{biblatex}
+\input{preamble}
+\usepackage[style=alphabetic, backend=biber]{biblatex}
 \usepackage{tocloft}
 \addbibresource{references.bib}
 \setlength{\cftbeforesecskip}{0.3em}
@@ -14,14 +14,25 @@
 \maketitle
 \tableofcontents
 \newpage
-
+\chapter{Introduction}
+        This document is a set of notes of algorithms of reinforcement learning and theories of reinforcement learning.
+        Following books were mainly used for studying algorithms and theories.
+        \begin{itemize}
+            \item \cite{Sutton2020};
+            \item \cite{Graesser2020};
+            \item \cite{Zhao2025};
+        \end{itemize}
 \part{Algorithms}
-    \chapter{Introduction}
     \chapter{Value-based Methods}
     \chapter{Policy-based Methods}
+    \input{pseudocodes/policy-based/policy-based.tex}
     \chapter{Model-based Methods}
 \part{Theories}
-    \chapter{Introduction}
+    \chapter{Basic Notations}
+    \input{theories/basic-concepts.tex}
+    \chapter{Bellman Equation}
+    \input{theories/bellman-eq.tex}
+    
 
 \printbibliography
 \end{document}

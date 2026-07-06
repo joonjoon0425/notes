@@ -1,0 +1,62 @@
+\section{REINFORCE}
+    \subsection{Main Idea}
+        \textbf{REINFORCE} is the most basic form of policy gradient method.
+        It's the vanilla policy gradient method.
+    \subsection{Objective Function}
+        REINFORCE uses following objective function;
+        \begin{equation}
+            J(\pi_\param)=\E_{\tau \sim \pi_\param}[G_0] = \E_{\tau \sim \pi_\param}\left[ \sum_{t=0}^{T-1}\gamma^tr_{t+1} \right].
+        \end{equation}
+        We use some tricks to compute the gradient of $J(\pi_\param)$
+        % TODO: add reference to trick here.
+        Then we get
+        \begin{equation}
+            \nabla_\param J(\pi_\param) = \E_{\tau \sim \pi_\param}\left[ \sum_{t=0}^{T-1}G_t\nabla_\param\log{\pi_\param(a_t|s_t)} \right].
+        \end{equation}
+        Now we can use this to update the parameter $\param$. Since we cannot compute the exact expectation, we use Monte Carlo sampling
+        to approximate $\nabla_\param J(\pi_\param)$ as following:
+        \begin{equation}
+            \nabla_\param J(\pi_\param) \approx \sum_{t=0}^{T-1}G_t\nabla_\param\log{\pi_\param(a_t|s_t)}
+        \end{equation}
+    \subsection{Pseudocode}
+        \Algorithm{reinforce}
+        {REINFORCE}
+        {
+            \inputitem{$\param$}{initial parameter} \\
+            \inputitem{$\gamma$}{discount rate} \\
+            \inputitem{$\alpha$}{learning rate}
+        }
+        {
+            \inputitem{$\pi_\param$}{learned policy}
+        }
+        {
+            initialize policy $\pi_\param$\;
+            \Repeat{convergence}
+            {
+                generate episode $\{s_0,a_0,r_1,\dots,s_{T-1},a_{T-1},r_{T}\}$ following $\pi_\param$\;
+                \For{$t=0,1,\dots,T-1$}
+                {
+                    \tcp{compute return-to-go}
+                    $G_t=\sum_{k=t+1}^{T} \gamma^{k-t-1}r_k$\;
+                    \tcp{policy update}
+                    $\param \leftarrow \param + \alpha\nabla_\param\log{\pi_\param(a_t|s_t)}G_t$\;
+                }
+            }
+            \Return{$\pi_\param$}
+        }
+    \subsection{Implementation Notes}
+        \begin{itemize}
+            \item When computing return-to-go, we can iterate backward from the terminal time to start, since $G_t \leftarrow \gamma G_{t+1} + r_{t+1}$ where $t=0, 1, 2,\dots,T-1$.
+        \end{itemize}
+        % TODO: add Implementation details
+    \subsection{Pros and Cons}
+        Pros:
+        \begin{itemize}
+            \item No need for model;
+            \item Can cover both discrete and continuous actions;
+        \end{itemize}
+        Cons:
+        \begin{itemize}
+            \item Large variance;
+            \item May converge to suboptimal policy;
+        \end{itemize}
