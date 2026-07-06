@@ -1,0 +1,85 @@
+\section{Introduction}
+In this section, we discuss common concepts that are used frequently in reinforcement learning.
+
+\section{State, Action, Policy and Reward}
+\subsection{State}
+    The \textbf{state} is the status of the agent with respect to the environment.
+    The set of all possible states, the \textbf{state space}, is denoted as $\mathcal{S}$.
+\subsection{Action}
+    The \textbf{action} is what agent can do, when a state is given. By choosing the action and
+    taking it, the agent moves to the next state, which is called \textbf{state transition}. The set of all possible actions in state $s$,
+    \textbf{action space} for state $s$, is denoted as $\mathcal{A}(s)$.
+    \subsubsection{Transition Probability}
+        Note that the transition can be stochastic. That is, the same choice of action in the same state
+        may not lead to equivalent next state. We denote this probability with conditional porbability as following:
+        \begin{equation}
+            p(s'|s,a)
+        \end{equation}
+        where $s',s \in \mathcal{S}$ and $a \in \mathcal{A}(s)$.
+\subsection{Policy}
+    The \textbf{policy} tells the agent which actions to take at every state. The policy can be deterministic or stochastic.
+    We denote the probability of taking action $a$ under state $s$ following policy $\pi$ as $\pi(a|s)$.
+\subsection{Reward}
+    \textbf{Reward} is one of the most unique concept of reinforcement learning. After the execution of action, the agent
+    receives a reward, denoted as $r$. The agent's goal is to maximize the total reward that the agent receives.
+    Due to this goal, the reward can encourage or discourage the agent's
+    choice of selecting an action under certain state. Again, the reward can be stochastic, too.
+
+    One question that follows naturally is: Can't we just pick the actions that gives the most reward at every state? If this was correct,
+    the reinforcement learning may not have existed. Since the reward is just an immediate information of the act, choosing only the action with
+    highest reward is not the correct answer, most of the time. There can be a better choice in the long run.
+
+\section{Trajectories, Returns and Episodes}
+    \subsection{Trajectory}
+        The \textbf{trajectory} is the footsteps of the agent. More formally, suppose that the agent is on the initial state $s_0$ and took action $a_0$.
+        The agent receives reward $r_1$ from environment and moves to state $s_1$. Again, the agent take an action $a_1$, receive reward $r_1$ and move to state $s_2$.
+        Repeating this, we get the trajectory of an agent:
+        \begin{equation}
+            s_0,a_0,r_1,s_1,a_1,r_2,\dots,s_{T-1},a_{T-1},r{T}. \label{eq:trajectory}
+        \end{equation}
+    \subsection{Returns}
+        Given the trajectory $\tau = \{s_0,a_0,r_1,s_1,a_1,r_2,\dots,s_{T-1},a_{T-1},r{T}\}$, we can calculate the \textbf{return} $G_t$, of the trajectory.
+        The naive definition of the return, called \textbf{total rewards} is the sum
+        \begin{equation}
+            G_t = \sum_{k=t+1}^{T}r_k. \label{eq:total-reward}
+        \end{equation}
+        The point is that we do not know if the terminal time $T$ is finite or not. If $T$ is not finite, than the cummulative reward \ref{eq:total-reward}
+        diverges. For this, we introduce the \textbf{discounted return}, defined as
+        \begin{equation}
+            G_t = \sum_{k=t+1}^{\infty}\gamma^{k - t - 1}r_k
+        \end{equation}
+        where $\gamma \in [0,1]$ is called \textbf{discount rate}.
+        This works for for finite trajectory too, if we let $r_k = 0$ for $k > T$.
+    \subsection{Episodes}
+        The \textbf{episode} is the finite trajectory itself, like \ref{eq:trajectory}. The episode may stop at the states called \textbf{terminal states}.
+        The tasks with episodes are called \textbf{episodic tasks}. Unlike episodic tasks, there are \textbf{continuing tasks}, which does not ends. These two can
+        be expressed in unified mathematical manner. For this, in the episodic task, we must consider the agent's behavior after the terminal state:
+        to stay in that state forever, or to take action like normal states. In this note, we follow the latter, like \cite{Zhao2025}.
+
+\section{Markov Decision Process}
+    \subsection{Definition}
+        The \textbf{Markov decision process} (MDP) is the general framework that describes the stochastic dynamic systems. It is defined as following:
+        \begin{defn}{Markov Decision Process}{MDP}
+            The \textbf{Markov decision process} is the 5-tuple $(\mathcal{S},\mathcal{A},p,\mathcal{R},\gamma)$, where each elements are defined as following:
+            \begin{itemize}
+                \item $\mathcal{S}$ is the state space, $\mathcal{A}(s)$ is the action space associated with state $s$, and $\mathcal{R}(s,a)$ is a set of rewards, associated with each state-action pair $(s,a)$.
+                \item $p(s',r|s,a)$ is the dynamics of the model, which is as probability of moving to state $s'$ from $s$ by taking action $a$, and obtaining reward $r$.
+                Note that the state transition probability and the reward probability can be decribed with dynamics. See \ref{rem:dynamics}
+                \item $\pi(s|a)$ is the policy, a probability of agent choosing action $a$ in state $s$.
+                \item $\gamma$ is the discount rate.
+            \end{itemize}
+            with the dynamics satisfying the \emph{Markov property}:
+            \begin{align}
+                p(s_{t+1}|s_t,a_t,s_{t-1},a_{t-1},\dots,s_0,a_0) &= p(s_{t+1}|s_{t},a_{t}) \\
+                p(r_{t+1}|s_t,a_t,s_{t-1},a_{t-1},\dots,s_0,a_0) &= p(r_{t+1}|s_{t},a_{t})
+            \end{align}
+            where $t$ is the current time step.
+        \end{defn}
+        \begin{rem}{Transition and reward probability as dynamics}{dynamics}
+            The 4-tuple dynamics can be used to describe transition probability and reward probability as following:
+            \begin{align}
+                p(s'|s,a) &= \sum_{r \in \mathcal{R}(s,a)}p(s',r|s,a) \\
+                p(r|s,a) &= \sum_{s' \in \mathcal{S}}p(s',r|s,a)
+            \end{align}
+        \end{rem}
+        The dynamics can be either stationary or non-stationary. If the dynamics changes over time, it is non-stationary; else, it is called stationary.
