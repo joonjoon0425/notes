@@ -1,0 +1,26 @@
+\section{Introduction}
+    This chapter reviews calculus briefly.
+
+\section{Limits and Continuity}
+    \subsection{Limit}
+        \begin{defn}{Limit}{limit}
+            Let $X \subset \mathbb{R}^n, Y \subset \mathbb{R}^m$.
+            Then, the function $f:X \to Y$ is said to have the \textbf{limit} $L$ at $x_0$ if and only if
+            \begin{equation}
+                \text{ for all } \varepsilon > 0,\ \text{there exists } \delta > 0 \text{ such that } \|f(x) - L\| < \varepsilon \Rightarrow \|x - x_0\| < \delta 
+            \end{equation}
+        \end{defn}
+    \subsection{Continuity}
+        \begin{defn}{Continuity}{continuity}
+            Let $X \subset \mathbb{R}^n, Y \subset \mathbb{R}^m$. Let $A \subset X$.
+            Then, the function $f:X \to Y$ is said to be \textbf{continuous} on set $A$ if and only if
+            \begin{equation}
+                \text{ for all } a \in A,\ \lim_{x \to a}f(x) = f(a),
+            \end{equation}
+            and denote it as $f \in C^0(X)$ where $C^0(X)$ is a set of continuous functions on $X$.
+        \end{defn}
+
+        \begin{thm}{Intermediate Value Theorem}{IVT}
+            Let $X \subset \mathbb{R}, Y \subset \mathbb{R}$. Let $a < b \in \mathbb{X}$. Let $f:X \to Y$ be a continuous function on $[a, b]$.
+            Then, if $K \in \mathbb{R}$ is any number between $f(a)$ and $f(b)$, then there exists a number $c\in[a,b]$ such that $f(c)=K$.
+        \end{thm}

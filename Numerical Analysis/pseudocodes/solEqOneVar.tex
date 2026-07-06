@@ -1,0 +1,141 @@
+\section{Bisection Method}
+    \subsection{Main Idea}
+        \textbf{Bisection method} is based on IVT, Theorem \ref{thm:IVT}.
+        Given a function $f$, we start with initial interval $[a, b]$ such that
+        $f(a)f(b)<0$, checking the sign of intermediate value 
+        $f(\frac{a+b}{2})$. If the sign equals that of $f(a)$, we set $a = \frac{a + b}{2}$, else we set $b = \frac{a + b}{2}$.
+    
+    \subsection{Pseudocode}
+        \Algorithm{bisectionMethod}
+        {Bisection Method}
+        {
+            \inputitem{$f(\cdot)$}{a function which we seek for its root} \\
+            \inputitem{$a < b \in \mathbb{R}$}{endpoints, satisfiying $f(a)f(b)<0$} \\
+            \inputitem{$N$}{number of iterations} \\
+            \inputitem{$TOL$}{tolerance}
+        }
+        {
+            \inputitem{$p$}{approximate solution}
+        }
+        {
+            \For{$i = 0, 1, 2, \dots, N - 1$}
+            {
+                $p \leftarrow \frac{a+b}{2}$\;
+                \If{$f(p)=0$ or $\frac{b - 2}{2} < TOL$}
+                {
+                    \Return{$p$} \tcp{procedure completed succesfully}
+                }
+                \ElseIf{$f(a)f(p) > 0$}
+                {
+                    $a \leftarrow p$\;
+                }
+                \Else
+                {
+                    $b \leftarrow p$\;
+                }
+            }
+            \Return{failure after $N$ iterations}
+        }
+
+    \subsection{Implementation Details}
+        \subsubsection{Stopping Procedure}
+            One can change the stopping prodecure of algorithm \ref{alg:bisectionMethod}. With tolerance $\varepsilon > 0$,
+            followings are examples of other stopping procedure:
+            \begin{align}
+                |p_N - p_{N-1}| &< \varepsilon \\
+                \dfrac{|p_N - p_{N-1}|}{|p_N|} &< \varepsilon,\ p_N \neq 0 \\
+                |f(p_N)| &< \varepsilon
+            \end{align}
+            But, there are some difficulties. There are sequences $\{p_n\}$ where $|p_n - p_{n-1}|$ converges to zero while $p_n\to\infty$.
+            If is also possible for $f(p_n)$ to be close to zero while $p_n$ differs signifnicantly from $p$.
+            The second procedure is the best when we know nothing about $f$ and $p$.
+
+        \subsubsection{Overflow and Underflow}
+            It is recommended to use following computation for calculating $\frac{a + b}{2}$:
+            \begin{equation}
+                p = a + \frac{b - a}{2}.
+            \end{equation}
+            When $b - a$ is near maximum precision, a round off error is still in presense, but it would not affect the value of $p$ so much.
+            However, when $a + b$ is near maximum precision, $\frac{a+b}{2}$ might not even produce a result in interval $[a,b]$.
+
+            Using \textbf{sign} function for determining the equality of sign can prevent overflow or underflow in the multiplication of $f(a)$ and $f(p)$.
+    \subsection{Pros and Cons}
+        Pros:
+        \begin{itemize}
+            \item Very easy to implement;
+        \end{itemize}
+        Cons:
+        \begin{itemize}
+            \item Slow convergence rate. It has linear convergence rate;
+            \item Cannot extend to multi-dimensional functions;
+            \item Does not exploit additional informations such as derivatives. This leads to slow convergence rates.
+        \end{itemize}
+    \subsection{Convergence}
+            TODO: Bisection Method Convergence Proof
+
+\section{Fixed-Point Iteration}
+    \subsection{Main Idea}
+        \textbf{Fixed-point iteration} is based on Theorem \ref{thm:fixedPoint}. The definition of fixed point is as following:
+        \begin{defn}{Fixed Point}{fixedPoint}
+            Let $X,\ Y \subset \mathbb{R}$. Then the \textbf{fixed point} of a function $f:X \to Y$ is a point $p \in X$ such that
+            \begin{equation}
+                f(p)=p.
+            \end{equation}
+        \end{defn}
+        There are sufficient conditions for the existence and uniqueness of a fixed point.
+        \begin{thm}{Existence and Uniqueness of a Fixed Point}{exisUniqFixedPoint}
+            Let $X,\ Y \subset \mathbb{R}$. Let $a < b \in X$, and let $g:X\to Y$ be a function.
+            Then, following holds:
+            \begin{enumerate}
+                \item If $g \in C[a,b]$ and $g(x) \in [a,b]$ for all $x \in [a,b]$, then $g$ has at least one fixed point in $[a,b]$.
+                \item If, in addition, $g'(x)$ exists on $(a,b)$ and a constant $0 < k < 1$ exists with $|g'(x)| \leq k$ for all $x \in (a,b)$,
+                    then there exists a unique fixed point in $(a,b)$.
+            \end{enumerate}
+        \end{thm}
+        \begin{proof}
+            Can be proved with IVT and MVT.
+        \end{proof}
+        One may wonder what fixed point does with the root of a function. By modifying the equation $f(x)=0$ a bit,
+        we can reformulate it into an equation about fixed point, for example, $f(x) + x = x$ or $x - 3f(x) = x$.
+
+        TODO: Figures of fixed point iteration
+    \subsection{Pseudocode}
+        \Algorithm{fixedPointIter}
+        {Fixed-Point Iteration}
+        {
+            \inputitem{$g(\cdot)$}{a function which we seek for its fixed point} \\
+            \inputitem{$p_0$}{initial approximation} \\
+            \inputitem{$N$}{number of iterations} \\
+            \inputitem{$TOL$}{tolerance}
+        }
+        {
+            \inputitem{$p$}{approximate solution}
+        }
+        {
+            \tcp{initialize}
+            $p \leftarrow p_0$\;
+            \For{$i = 0, 1, 2, \dots, N$}
+            {
+                $p \leftarrow g(p)$\;
+                \If{$|p-p_0| < TOL$}
+                {
+                    \Return{$p$} \tcp{procedure completed succesfully}
+                }
+            }
+            \Return{failure after $N$ iterations}
+        }
+    \subsection{Implementation Details}
+    \subsection{Pros and Cons}
+        Pros:
+        \begin{itemize}
+            \item Easy to implement;
+        \end{itemize}
+        Cons:
+        \begin{itemize}
+            \item Slow convergence rate. It has linear convergence rate. Methods of increasing convergence rate is treated in \ref{}.
+            \item Depends on the modified equation. Convergence result depends on the modified equation of $f(x)=0$;
+        \end{itemize}
+    \subsection{Convergence}
+        \subsubsection{Fixed-Point Theorem}
+            \begin{thm}{Fixed-Point Theorem}{fixedPoint}
+            \end{thm}
