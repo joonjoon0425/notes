@@ -28,7 +28,7 @@ All reinforcement learning algorithms are designed to solve this equation.
                      &= \E[R_{t+1} + \gamma G_{t+1}|S_t=s] \\
                      &= \E[R_{t+1}|S_t=s] + \gamma \E[G_{t+1}|S_t=s]
         \end{align} 
-        Using the law of total expectation, we get
+        Using the law of total expectation \ref{eq:cond-LTE}, we get
         \begin{align}
             \E[R_{t+1}|S_t=s] &= \sum_{a \in \mathcal{A}(s)}\pi(a|s)\E[R_{t+1}|S_t=s,A_t=a] \\
                               &= \sum_{a \in \mathcal{A}(s)}\pi(a|s)\sum_{r \in \mathcal{R}(s,a)}p(r|s,a)r
@@ -92,4 +92,28 @@ All reinforcement learning algorithms are designed to solve this equation.
                 \item The sum of the values of every row equals 1. Matrix with this property is called a \emph{stochastic matrix}.
             \end{itemize}
         \end{rem}
-    \section{Solving the Bellman Equation}
+\section{Solving The Bellman Equation}
+    There are two methods in solving the Bellman equation. The closed-form solution, and the iterative solution.
+    \subsection{Closed-form Solution}
+        Since we have represented the Bellman equation as the matrix form, solving it is very easy.
+        \begin{thm}{Closed-form Solution of The Bellman Equation}{ClosedFormSolBellmanEq}
+            Let $\pi$ be a given policy, and $v_\pi$, $r_\pi$, $P_\pi$ be given as \ref{eq:VecForm}.
+            The solution to the equation $v_\pi = r_\pi + \gamma P_\pi v_\pi$ is given as
+            \begin{equation}
+                v_\pi = (I-\gamma P_\pi)^{-1}r_\pi
+            \end{equation}
+        \end{thm}
+        \begin{proof}
+            Manipulate the equation as following:
+            \begin{align}
+                v_\pi &= r_\pi + \gamma P_\pi v_\pi \\
+                v_\pi - \gamma P_\pi v_\pi &= r_\pi \\
+                (I - \gamma P_\pi)v_\pi &= r_\pi.
+            \end{align}
+            Now, what we have to show is that the matrix $I - \gamma P_\pi$ is invertible.
+            TODO: add Geshgorin Circle Theorem
+        \end{proof}
+        TODO: add properties of $I - \gamma P_\pi$.
+    \subsection{Iterative Solution}
+
+\section{Bellman Equation for Action-Value Function}
