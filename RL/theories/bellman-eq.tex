@@ -106,14 +106,76 @@ All reinforcement learning algorithms are designed to solve this equation.
         \begin{proof}
             Manipulate the equation as following:
             \begin{align}
-                v_\pi &= r_\pi + \gamma P_\pi v_\pi \\
-                v_\pi - \gamma P_\pi v_\pi &= r_\pi \\
-                (I - \gamma P_\pi)v_\pi &= r_\pi.
+                &v_\pi = r_\pi + \gamma P_\pi v_\pi \\
+                &v_\pi - \gamma P_\pi v_\pi = r_\pi \\
+                &(I - \gamma P_\pi)v_\pi = r_\pi.
             \end{align}
             Now, what we have to show is that the matrix $I - \gamma P_\pi$ is invertible.
-            TODO: add Geshgorin Circle Theorem
+            We use the fact that $A$ is invertible $\Leftrightarrow$ eigenvalues of $A$ are nonzero.
+            To show this, we use Geshgorin Circle Theorem \ref{thm:Geshgorin}. Note that the $i$-th Geshgorin circles has a center at $1-\gamma p(s_i|s_i)$, with
+            radius $\sum_{j \neq i}\gamma p_\pi(s_j|s_i)$. Since $P_\pi$ is stochastic matrix, we know that $\sum_{j}\gamma p(s_j|s_i)=\gamma < 1$.
+            That is, $\sum_{j \neq i}\gamma p_\pi(s_j|s_i) < 1 - \gamma p_\pi(s_i|s_i)$, which means that the $i$-th Geshgorin circle cannot contain the origin.
+            According to the Geshgorin Circle Theorem, all the eigenvalues cannot be zero.
         \end{proof}
         TODO: add properties of $I - \gamma P_\pi$.
     \subsection{Iterative Solution}
+        The direct method for solving the Bellman equation is not used very well in practice, since the inverse matrix computation is very costly.
+        Instead of the close-form method, in practice, we use iterative method to solve the Bellman equation.
+        \begin{thm}{Iterative Solution of The Bellman Equation}{IterativeSolBellmanEq}
+            Let $\pi$ be a policy and $v_\pi$, $r_\pi$, and $P_\pi$ be that of \ref{eq:VecForm}. Then, the
+            solution of \ref{thm:MVFormBellmanEq} equals the limit of following sequence $\{v_k\}$:
+            \begin{equation}
+                v_{k+1}=r_\pi + \gamma P_\pi v_k \label{eq:IterSolBellmanEq}
+            \end{equation}
+        \end{thm}
+        \begin{proof}
+            What we have to show is that $v_k \to v_\pi$ as $k \to \infty$. For this, we let $\delta_k = v_k - v_\pi$ and show that $\delta_k \to 0$.
+            Substituting $v_{k+1} = \delta_{k+1} + v_\pi$ and $v_k = \delta_k + v_\pi$ into equation \ref{eq:IterSolBellmanEq},
+            we have
+            \begin{equation}
+                \delta_{k+1} = \gamma P_\pi \delta_k.
+            \end{equation}
+            Since $P_\pi$ is a stochastic matrix and $0 < \gamma < 1$, we know that $\delta_k \to 0$ as $k \to \infty$.
+        \end{proof}
 
 \section{Bellman Equation for Action-Value Function}
+    Now we introduce the \textbf{action value}, which denotes the value of an action at a state.
+    \subsection{Action Value}
+        The action value is defined as following:
+        \begin{defn}{Action Value}{action-value}
+            Let $\pi$ be a given policy. Then, the \textbf{action value} of a state-action pair is defined as
+            \begin{equation}
+                q_\pi(s,a) = \E[G_t|S_t=s,A_t=a].
+            \end{equation}
+        \end{defn}
+        \begin{rem}{Properties of Action Value}{ActionValProp}
+            Action value $q_\pi(s,a)$ has following properties.
+            \begin{itemize}
+                \item $v_\pi=\sum_{a \in \mathcal{A}(s)} \pi(a|s)q_\pi(s,a)$
+                \item $q_\pi(s,a) = \sum_{r \in \mathcal{R}(s,a)}p(r|s,a)r + \gamma \sum_{s' \in \mathcal{S}}p(s'|s,a)v_\pi(s')$
+            \end{itemize}
+        \end{rem}
+        \begin{proof}
+            \begin{itemize}
+                \item Use the law of total expectation \ref{eq:cond-LTE}.
+                \item Use the result above and \ref{thm:BellmanEq-SV}.
+            \end{itemize}
+        \end{proof}
+    \subsection{Bellman Equation for Action-Value Function}
+        The Bellman equation for action-value function is already in our hand, since actually the Remark \ref{rem:ActionValProp}
+        is what all we need.
+        \begin{thm}{Bellman Equation for Action-value Function}{BellmanEq-AV}
+            Let $\pi$ be a given policy, and let $q_\pi(s,a)$ be an action value. Then, the following Bellman equation is satisfied:
+            \begin{equation}
+                q_\pi(s,a) = \sum_{r \in \mathcal{R}(s,a)}p(r|s,a)r + \gamma \sum_{s' \in \mathcal{S}}p(s'|s,a)\sum_{a' \in \mathcal{A}(s')}\pi(a'|s')q_\pi(s',a')
+            \end{equation}
+            Moreover, the matrix-vector form is given as
+            \begin{equation}
+                q_\pi = \tilde{r} + \gamma \tilde{P} \Pi q_\pi
+            \end{equation}
+            where $[q_\pi]_{(s,a)}=q_\pi(s,a)$, $\tilde{r}_{(s,a)}=\sum_{r \in \mathcal{R}(s,a)}p(r|s,a)r$, $[\tilde{P}]_{(s,a),s'}=p(s'|s,a)$ and $\Pi$ is a block diagonal matrix
+            such that $\Pi_{s',(s',a')}=\pi(s'|a')$ for $a' \in \mathcal{A}(s')$ and other entries are all zero.
+        \end{thm}
+        \begin{proof}
+            Use the Remark \ref{rem:ActionValProp}. For the matrix-vector form, try to derive it, as we did in Theorem \ref{thm:MVFormBellmanEq}.
+        \end{proof}
