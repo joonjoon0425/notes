@@ -5,7 +5,7 @@
     \subsection{Objective Function}
         REINFORCE uses following objective function;
         \begin{equation}
-            J(\pi_\param)=\E_{\tau \sim \pi_\param}[G_0] = \E_{\tau \sim \pi_\param}\left[ \sum_{t=0}^{T-1}\gamma^tr_{t+1} \right].
+            J(\pi_\param)=\E_{\tau \sim \pi_\param}[G_t] = \E_{\tau \sim \pi_\param}\left[ \sum_{t=0}^{T-1}\gamma^tr_{t+1} \right].
         \end{equation}
         We use some tricks to compute the gradient of $J(\pi_\param)$
         % TODO: add reference to trick here.

@@ -1,2 +1,89 @@
 \section{Introduction}
-\section{Bellman Optimal Equation}
+    This chapter introduces the Bellman optimal equation (BOE), and proves serveral
+    properties of it. This section mainly follows the book \cite{Zhao2025}.
+\section{Optimal Policy}
+    The reinforcement learning algorithms are all designed to find an optimal policy for
+    given enviroment. Then, what is an 'optimal' policy? The definition is given below.
+    \begin{defn}{Optimal Policy and Optimal State Value}{optPol}
+        A policy $\pi^*$ is optimal if and only if $v_\pi^*(s) \geq v_\pi(s)$ for all $s \in \mathcal{S}$
+        and for any other policy $\pi$. The state values of $\pi^*$ are the optimal state values.
+    \end{defn}
+    \begin{defn}{Better Policy}{betterPol}
+        A policy $\pi_1$ is \textbf{better} than a policy $\pi_2$ if and only if
+        $v_{\pi_1}(s) \geq v_{\pi_2}(s)$ for all $s \in \mathcal{S}$.
+    \end{defn}
+    The questions that naturally arise are:
+    \begin{itemize}
+        \item Existence: Does the optimal policy exists?
+        \item Uniqueness: Is the optimal policy unique?
+        \item Stochasticity: Is the optimal policy stochastic or deterministic?
+        \item Algorithm: How do we obtain the optimal policy and the optimal state values?
+    \end{itemize}
+\section{Bellman Optimality Equation}
+    The optimal policy and optimal state values can be analyised via the \textbf{Bellman optimality equation} (BOE).
+    The optimal state values satisfies following Bellman optimality equation. This claim in fact has two logically independent statements:
+    \begin{enumerate}
+        \item The BOE, viewed purely as a fixed-point equation, has a unique solution (Section \ref{sec:SolveBellmanOptEq});
+        \item The unique solution of BOE concides with the optimal stat-value function $v^*$, and the derived greedy policy is optimal (Section \ref{sec:OptPolOptStateValBOE})
+    \end{enumerate}
+    Note that the Section \ref{sec:SolveBellmanOptEq} does not assume that the state-value function is optimal.
+    \begin{defn}{Bellman Optimality Equation}{BellOptEq}
+        Let $\Pi$ be a set of possible policies and let $\gamma \in (0,1)$ be a discount rate. Then, the Bellman Optimality Equation is defined as
+        \begin{align}
+            v(s) &= \max_{\pi \in \Pi} \sum_{a \in \mathcal{A}(s)}\pi(a|s)\left( \sum_{r \in \mathcal{R}}p(r|s,a)r + \gamma \sum_{s' \in \mathcal{S}}p(s'|s,a)v(s') \right) \\
+                 &= \max_{\pi \in \Pi} \sum_{a \in \mathcal{A}(s)}\pi(a|s)q(s,a)
+        \end{align}
+        where $v(s),v(s')$ are unkown variables to be solved.
+        Additionally, the matrix-vector form of Bellman optimality equation is given as
+        \begin{equation}
+            v = \max_{\pi \in \Pi}(r_\pi + \gamma P_\pi v)
+        \end{equation}
+        where $r_\pi$ and $P_\pi$ are given as \ref{eq:VecForm}.
+    \end{defn}
+    Using the matrix-vector form of BOE, we can express BOE very simply as following:
+    \begin{equation}
+        v = f(v)
+    \end{equation}
+    where $f(v) = \max_{\pi \in \Pi}(r_\pi + \gamma P_\pi v)$ \label{eq:BOERightHandSide}.
+\section{Solving The Bellman Optimality Equation}\label{sec:SolveBellmanOptEq}
+    \subsection{Contraction Mapping Theorem}
+        We propose a \textbf{contraction mapping theorem}, the main tool for solving the BOE.
+        The contraction mapping theorem is a powerful tool for analyzing general nonlinear equations.
+        \begin{defn}{Contraction Mapping}{ContractMap}
+            Let $f : \mathbb{R}^d \to \mathbb{R}^d$. Then, the function $f$ is a \textbf{contraction mapping}
+            if there exists $\gamma \in (0,1)$ such that
+            \begin{equation}
+                \|f(x_1) - f(x_2)\| \leq \gamma \|x_1-x_2\|
+            \end{equation}
+            for all $x_1,x_2 \in \mathbb{R}^d$.
+        \end{defn}
+        Now we present the contraction mapping theorem.
+        \begin{thm}{Contraction Mapping Theorem}{ContractMap}
+            Let $f:\mathbb{R}^n \to \mathbb{R}^n$ be a contraction mapping. Then, the following properties hold for equation $x=f(x)$:
+            \begin{itemize}
+                \item Existence: There exists a fixed point $x^*$ satisfying $f(x^*)=x^*$;
+                \item Uniqueness: The fixed point $x^*$ is unique;
+                \item Algorithm: The following sequence $\{x_k\}$ converges to the fixed point $x^*$ exponentially, for any initial $x_0$.
+                    \begin{equation}
+                        x_{k+1} = f(x_k)
+                    \end{equation}
+            \end{itemize}
+        \end{thm}
+        \begin{proof}
+            
+        \end{proof}
+    \subsection{Contraction Property of Bellman Optimality Equation}
+        Now, to use the contraction mapping theorem, we prove that the right-hand side of BOE \ref{eq:BOERightHandSide} is a contraction mapping.
+        \begin{thm}{Contraction Property of Bellman Optimality Equation}{ContPropBellmanOptEq}
+            Let the function $f$ be that of equation \ref{eq:BOERightHandSide}. Then, the following contraction mapping property holds for any $v_1,v_2 \in \mathbb{R}^{|\mathcal S|}$:
+            \begin{equation}
+                \|f(v_1)-f(v_2)\|_{\infty} \leq \gamma \|v_1 - v_2\|_\infty
+            \end{equation}
+            where $\gamma \in (0,1)$ is the discount rate, and $\|\|_\infty$ is the maximum norm, which is the maximum absolute value of the elements in a vector.
+        \end{thm}
+        \begin{proof}
+        
+        \end{proof}
+\section{Optimal Policy, Optimal State Value and Bellman Optimality Equation}\label{sec:OptPolOptStateValBOE}
+    Now, we prove that the solution of the Bellman optimality equation is really an optimal state-value function,
+    and prove that the greedy policy derived from it is the optimal policy.
