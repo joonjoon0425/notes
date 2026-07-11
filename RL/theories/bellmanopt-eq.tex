@@ -70,7 +70,43 @@
             \end{itemize}
         \end{thm}
         \begin{proof}
-            
+            \textit{Part 1.} (Convergence) The sequence $\{x_k\}$ defined as $x_{k+1}=f(x_k)$ converges.
+
+            We show that the sequence $\{x_k\}$ is a Cauchy sequence; i.e., there always exists an $N \in \mathcal{N}$ such that $\|x_m-x_n\| < \epsilon$ for any $\epsilon > 0$.
+            The Cauchy sequence has a nice property; the Cauchy sequence always converges. This can be proved by using the properties of $\mathcal{R}$, that the $\mathcal{R}$ is a compact set.
+            We won't show this here. The following holds:
+            \begin{align}
+                \|x_{k+1}-x_k\| = &\|f(x_k) - f(x_{k-1})\| \\
+                                  &\leq \gamma \|x_k - x_{k-1}\| \\
+                                  &\leq \gamma^2 \|x_{k-1}-x_{k-2}\| \\
+                                  &\leq \gamma^3 \|x_{k-2}-x_{k-3}\| \\
+                                  &\vdots \\
+                                  &\leq \gamma^k \|x_1 - x_0\|
+            \end{align}
+            Using this, we can show that
+            \begin{align}
+                \|x_m - x_n\| &\leq \|x_m - x_{m-1}\| + \|x_{m-1} - x_{m-2}\| + \cdots + \|x_{n+1} - x_n\| \\
+                              &\leq \gamma^{m-1}\|x_1-x_0\| + \gamma^{m-2}\|x_1-x_0\| + \dots + \gamma^{n}\|x_1-x_0\| \\
+                              &= \|x_1-x_0\| (\gamma^{m-1} + \gamma^{m-2} + \dots + \gamma^n) \\
+                              &= \|x_1-x_0\| \frac{\gamma^n(1-\gamma^{m-n-2})}{1-\gamma} \\
+                              &\leq \|x_1-x_0\| \frac{\gamma^n}{1-\gamma}
+            \end{align}
+            where $m \geq n$, without loss of generality. Since $\gamma \in (0,1)$, the last line converges to 0. That is, the sequence $\{x_k\}$ is a Cauchy sequence.
+
+            \textit{Part 2.} (Existence) $\lim_{k \to \infty} x_k$ is a solution of fixed-point equation $x=f(x)$.
+
+            Let $x^* = \lim_{k \to \infty} x_k$. Then, following holds.
+            \begin{align}
+                \|x^*-f(x^*)\| &\leq \|x^*-x_k\| + \|f(x_k)-f(x^*)\| + \|x_k-f(x_k)\| \\
+                               &\leq \|x^*-x_k\| + \gamma \|x_k - x^*\| + \|x_k - f(x_k)\|
+            \end{align}
+            Using the results of \textit{Part 1} and squeeze theorem, we can show that $x^*=f(x^*)$.
+
+            \textit{Part 3.} (Uniqueness) The fixed-point $x^*$ is unique.
+
+            Suppose there is another fixed point $x'$. Then, $\|x^*-x'\| = \|f(x^*)-f(x')\| \leq \gamma \|x^*-x'\|$. Since $\gamma \in (0,1)$, the only possibility is $x^*=x'$.
+
+
         \end{proof}
     \subsection{Contraction Property of Bellman Optimality Equation}
         Now, to use the contraction mapping theorem, we prove that the right-hand side of BOE \ref{eq:BOERightHandSide} is a contraction mapping.
@@ -82,8 +118,48 @@
             where $\gamma \in (0,1)$ is the discount rate, and $\|\|_\infty$ is the maximum norm, which is the maximum absolute value of the elements in a vector.
         \end{thm}
         \begin{proof}
-        
+            Let $v_1, v_2 \in \mathbb{R}^{\mathcal{S}}$, and let $\pi_1^* = \arg\max_\pi{(r_\pi + \gamma P_\pi v_1)}$, $\pi_2^* = \arg\max_\pi{(r_\pi + \gamma P_\pi v_2)}$.
+            Then,
+            \begin{align}
+                f(v_1) &= \max_\pi{(r_\pi + \gamma P_\pi v_1)} = r_{\pi_1^*} + \gamma P_{\pi_1^*}v_1 \geq r_{\pi_2^*} + \gamma P_{\pi_2^*}v_1 \\
+                f(v_2) &= \max_\pi{(r_\pi + \gamma P_\pi v_2)} = r_{\pi_2^*} + \gamma P_{\pi_2^*}v_2 \geq r_{\pi_1^*} + \gamma P_{\pi_1^*}v_2
+            \end{align}
+            where $\geq$ is applied elementwise. This result leads to
+            \begin{align}
+                f(v_1)-f(v_2) &\leq \gamma P_{\pi_1^*}(v_1-v_2) \\
+                f(v_2)-f(v_1) &\leq \gamma P_{\pi_2^*}(v_2-v_1)
+            \end{align}
+            Let $z=\max{\{|\gamma P_{\pi_1^*}(v_1-v_2)|, |\gamma P_{\pi_2^*}(v_2-v_1)|\}}$, where $\max(\cdot)$ and $|\cdot|$ are all applied elementwise.
+            Then,
+            \begin{equation}
+                \|f(v_1) - f(v_2)\|_{\infty} \leq \|z\|_{\infty}. \label{tmpeq:1}
+            \end{equation}
+            Now, let $z_i$ be the $i$-th entry of $z$, and let $p_i^{\top}$ and $q_i^{\top}$ be the $i$-th row of $P_{\pi_1^*}$ and $P_{\pi_2^*}$, respectively.
+            Then, $z_i = \max{\{\gamma |p_i^{\top}(v_1-v_2)|, \gamma|q_i^{\top}(v_1-v_2)|\}}$.
+            Since all the elements of vector $p_i$ is nonnegative and thier sum equals 1,
+            \begin{equation}
+                |p_i^\top(v_1-v_2)| \leq p_i^\top|v_1-v_2| \leq \|v_1-v_2\|_\infty.
+            \end{equation}
+            where $|\cdot|$ is applied elementwise.
+            Similarly, $|q_i^\top(v_1-v_2)| \leq \|v_1-v_2\|_\infty$. Therefore $\|z\|_\infty \leq \gamma \|v_1-v_2\|_\infty$.
+            Substituting to \ref{tmpeq:1},
+            \begin{equation}
+                \|f(v_1)-f(v_2)\|_{\infty} \leq \gamma \|v_1 - v_2\|_\infty.
+            \end{equation}
         \end{proof}
+\newpage
 \section{Optimal Policy, Optimal State Value and Bellman Optimality Equation}\label{sec:OptPolOptStateValBOE}
-    Now, we prove that the solution of the Bellman optimality equation is really an optimal state-value function,
+    We have a following Theorem of BOE:
+    \begin{thm}{Solution of the Bellman Optimality Equation}{SolutionBellmanOptEq}
+        Let $f$ be as the equation \ref{eq:BOERightHandSide}. Then, the BOE $v=f(v)$ has following properties:
+        \begin{enumerate}
+            \item There exists a unique solution;
+            \item The solution can be obtained iteratively by $v_{k+1}=f(v_k)$.
+        \end{enumerate}
+    \end{thm}
+    \begin{proof}
+        All the previous Theorems (\ref{thm:ContractMap}, \ref{thm:ContPropBellmanOptEq}) proves this trivially.
+    \end{proof}
+
+    Now, we should prove that the solution of the Bellman optimality equation is really an optimal state-value function,
     and prove that the greedy policy derived from it is the optimal policy.
