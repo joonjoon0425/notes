@@ -163,3 +163,50 @@
 
     Now, we should prove that the solution of the Bellman optimality equation is really an optimal state-value function,
     and prove that the greedy policy derived from it is the optimal policy.
+    \begin{thm}{Optimality of $v^*$ and $\pi^*$}{OptPolOptStateVal}
+        Let $v^*$ be the solution of BOE $v=f(v)$, and let $\pi^* = \arg\max_{\pi \in \Pi}(r_\pi + \gamma P_\pi v^*)$.
+        The, the $v^*$ is an optimal state vaule function, and the $\pi^*$ is an optimal policy. That is, for any policy $\pi$,
+        following holds;
+        \begin{equation}
+            v^* = v_{\pi^*} \geq v_\pi
+        \end{equation}
+        where $v_\pi$ is the state value function of $\pi$, and $\geq$ is applied elementwise.
+    \end{thm}
+    \begin{proof}
+        For any policy $\pi$, $v_\pi = r_\pi + \gamma P_\pi v_\pi$ holds (Bellman equation). Then,
+        \begin{align}
+            v^* &= \max_{\tau \in \Pi}(r_\tau + \gamma P_\tau v^*) \\
+                &= r_{\pi^*} + \gamma P_{\pi^*} v^* \\
+                &\geq r_\pi + \gamma P_\pi v^*
+        \end{align}
+        and we have
+        \begin{equation}
+            v^*-v_\pi \geq \gamma P_\pi(v^*-v_\pi).
+        \end{equation}
+        Using this inequality repeatedly, we have $v^*-v_\pi \geq \gamma^n P_\pi^n (v^*-v_\pi)$ for any $n \in \mathbb{N}$.
+        Since $\gamma \in (0,1)$ and $P_\pi$ is a nonnegative matrix with all its elements less than or equal to 1,
+        $\lim_{n \to \infty} \gamma^n P_\pi^n (v^*-v_\pi)=0$. That is, $v^*-v_\pi \geq \lim_{n \to \infty} \gamma^n P_\pi^n (v^*-v_\pi)=0$.
+    \end{proof}
+    The following theorem examines the optimal policy more precisely.
+    \begin{thm}{Greedy Optimal Policy}{GreedyOptPol}
+        For any $s \in \mathcal{S}$, the following deterministic policy is an optimal policy for solving the BOE.
+        \begin{equation}
+            \pi^*(a|s) = 
+            \begin{cases}
+                1, &a = \arg\max_a q^*(a,s) \\
+                0, &a \neq \arg\max_a q^*(a,s)
+            \end{cases}
+        \end{equation}
+        where $q^*(s,a) = \sum_{r \in \mathcal{R}}p(r|s,a)r + \gamma \sum_{s' \in \mathcal{S}}p(s'|s,a)v^*(s')$.
+    \end{thm}
+    \begin{proof}
+        From Theorem \ref{thm:SolutionBellmanOptEq} and \ref{defn:BellOptEq}, we see that
+        \begin{align}
+            v^*(s) &= \max_{\pi \in \Pi}\sum_{a \in \mathcal{A}}\pi(a|s)q^*(s,a) \\
+                        &\leq \left(\max_{\pi \in \Pi}\sum_{a \in \mathcal{A}}\pi(a|s)\right) \max_{a'} q^*(s,a') \label{tmpeq:2} \\
+                        &= \max_{a'}q^*(s,a')
+        \end{align}
+        and the given deterministic policy $\pi^*$ satisfies the equality of inequality \ref{tmpeq:2}.
+    \end{proof}
+    The important truth is that the optimal state value is unique but the optimal policy is not. The Theorem \ref{thm:GreedyOptPol}
+    only shows that there always exists at least one deterministic optimal policy. There still can be other optimal policies, too, stochastic or whatever.
