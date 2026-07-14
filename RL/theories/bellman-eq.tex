@@ -1,4 +1,5 @@
 \section{Introduction}
+TODO: Introduce the Bellman Operator and Bellman Optimality Operator.
 The \textbf{Bellman equation} is the heart of reinforcement learning.
 All reinforcement learning algorithms are designed to solve this equation.
 \section{Bellman Equation}
@@ -166,9 +167,10 @@ All reinforcement learning algorithms are designed to solve this equation.
         is what all we need.
         \begin{thm}{Bellman Equation for Action-value Function}{BellmanEq-AV}
             Let $\pi$ be a given policy, and let $q_\pi(s,a)$ be an action value. Then, the following Bellman equation is satisfied:
-            \begin{equation}
-                q_\pi(s,a) = \sum_{r \in \mathcal{R}(s,a)}p(r|s,a)r + \gamma \sum_{s' \in \mathcal{S}}p(s'|s,a)\sum_{a' \in \mathcal{A}(s')}\pi(a'|s')q_\pi(s',a')
-            \end{equation}
+            \begin{align}
+                q_\pi(s,a) &= \sum_{r \in \mathcal{R}(s,a)}p(r|s,a)r + \gamma \sum_{s' \in \mathcal{S}}p(s'|s,a)\sum_{a' \in \mathcal{A}(s')}\pi(a'|s')q_\pi(s',a') \\
+                           &= \sum_{r \in \mathcal{R}(s,a)}p(r|s,a)r + \gamma \sum_{s' \in \mathcal{S}}p(s'|s,a)v_\pi(s') 
+            \end{align}
             Moreover, the matrix-vector form is given as
             \begin{equation}
                 q_\pi = \tilde{r} + \gamma \tilde{P} \Pi q_\pi

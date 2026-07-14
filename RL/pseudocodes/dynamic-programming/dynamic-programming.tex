@@ -35,7 +35,7 @@ Three algorithms will be presented;
         {\inputitem{$v^*,\pi^*$}{optimal state value and optimal policy}}
         {
             $\pi \leftarrow$ greedy policy derived from $v$\;
-            \Repeat{convergence}
+            \Repeat{convergence of $v$}
             {
                 \For{$s \in \mathcal{S}$} {
                     \For{$a \in \mathcal{A}(s)$} {
@@ -43,7 +43,7 @@ Three algorithms will be presented;
                     }
                     $a^* \leftarrow \arg\max_a q(s,a)$\;
                     \tcp{policy update}
-                    $\pi(s,a)=
+                    $\pi(s|a)=
                     \begin{cases}
                         1 &\text{if $a$ = $a^*$} \\
                         0 &\text{otherwise}
@@ -77,5 +77,98 @@ Three algorithms will be presented;
 
         Also, note that policy iteration has another iterative algorithm inside it: the policy evaluation uses iterative algorithm for solving the
         Bellman equation $v_{\pi_k} = r_{\pi_k} + \gamma P_{\pi_k}v_{\pi_k}$.
-
+    \subsection{Pseudocode}
+        \Algorithm{policyIter}
+        {Policy Iteration Algorithm}
+        {\inputitem{$p(s',r|s,a)$}{the dynamics of the system} \\
+         \inputitem{$\pi$}{initial guess}}
+        {\inputitem{$v^*,\pi^*$}{optimal state value and optimal policy}}
+        {
+            \Repeat{convergence of $v$}
+            {
+                \tcp{policy evaluation}
+                $v' \leftarrow$ arbitrary initial guess\;
+                \Repeat{convergence of $v'$}
+                {
+                    \For{each state $s \in \mathcal{S}$}
+                    {
+                        $v'(s) \leftarrow \sum_a\pi(a|s)\Big[ \sum_r p(r|s,a)r + \gamma \sum_{s'}p(s'|s,a)v'(s') \Big]$\;
+                    }
+                }
+                $v \leftarrow v'$\;
+                \tcp{policy improvement}
+                \For{each state $s \in \mathcal{S}$}
+                {
+                    \For{each action $a \in \mathcal{A}(s)$}
+                    {
+                        $q(s,a) \leftarrow \sum_r p(r|s,a)r + \gamma \sum_{s'}p(s'|s,a)v(s')$\;
+                    }
+                    $a^* \leftarrow \arg\max_a q(s,a)$\;
+                    $\pi(a|s) \leftarrow
+                    \begin{cases}
+                        1 &\text{if $a=a^*$} \\
+                        0 &\text{otherwise}
+                    \end{cases}$\;
+                }
+            }
+            \Return{$v$, $\pi$}
+        }
+    \subsection{Convergence}
+    TODO: convergence proof of policy iteration theorem. This will be done after studying the operator version of Bellman Equation.
+\section{Truncated Policy Iteration}
+    \subsection{Main Idea}
+        The \textbf{truncated policy iteration} is a more general algorithm including value iteration and policy iteration as its special cases.
+        The algorithm has only one difference with policy iteration: in the policy evaluation step, the truncated policy iteration iterates only finite times,
+        even when the convergence condition is not met.
         
+        The perspective of looking at the truncated policy iteration as the generalization of policy iteration and value iteration
+        can be derived from the similiarity between value iteration and policy iteration.
+        With the assumption that $v_\pi^{(0)}=v_0=v_{\pi_0}$,
+        \begin{align}
+        &v_{\pi_1}^{(0)} = v_0 \\
+        \text{value iteration}\leftarrow v_1 \longleftarrow &v_{\pi_1}^{(1)} = r_{\pi_1} + \gamma P_{\pi_1}v_{\pi_1}^{(0)} \\
+        &v_{\pi_1}^{(2)} = r_{\pi_1} + \gamma P_{\pi_1}v_{\pi_1}^{(1)} \\
+        &v_{\pi_1}^{(3)} = r_{\pi_1} + \gamma P_{\pi_1}v_{\pi_1}^{(2)} \\
+        &\vdots \\
+        \text{truncated policy iteration}\leftarrow \bar{v}_1 \longleftarrow &v_{\pi_1}^{(j+1)} = r_{\pi_1} + \gamma P_{\pi_1}v_{\pi_1}^{(j)} \\
+        &\vdots \\
+        \text{policy iteration}\leftarrow v_{\pi_1} \longleftarrow &v_{\pi_1}^{(\infty)} = r_{\pi_1} + \gamma P_{\pi_1}v_{\pi_1}^{(\infty)} \\
+        \end{align}
+        While value iteration computes only once and update the state value and policy iteration iterates until convergence and use it as state value of policy,
+        the truncated policy iteration iterates only finite number of times.
+    \subsection{Pseudocode}
+        \Algorithm{policyIter}
+        {Policy Iteration Algorithm}
+        {\inputitem{$p(s',r|s,a)$}{the dynamics of the system} \\
+         \inputitem{$\pi$}{initial guess}}
+        {\inputitem{$v^*,\pi^*$}{optimal state value and optimal policy}}
+        {
+            \Repeat{convergence of $v$}
+            {
+                \tcp{policy evaluation}
+                $v' \leftarrow$ arbitrary initial guess\;
+                \For{$k = 0,1,\dots,k_{\text{truncate}} - 1$}
+                {
+                    \For{each state $s \in \mathcal{S}$}
+                    {
+                        $v^{(k+1)}(s) \leftarrow \sum_a\pi(a|s)\Big[ \sum_r p(r|s,a)r + \gamma \sum_{s'}p(s'|s,a)v^{(k)}(s') \Big]$\;
+                    }
+                }
+                $v \leftarrow v^{(k_{\text{truncate}})}$\;
+                \tcp{policy improvement}
+                \For{each state $s \in \mathcal{S}$}
+                {
+                    \For{each action $a \in \mathcal{A}(s)$}
+                    {
+                        $q(s,a) \leftarrow \sum_r p(r|s,a)r + \gamma \sum_{s'}p(s'|s,a)v(s')$\;
+                    }
+                    $a^* \leftarrow \arg\max_a q(s,a)$\;
+                    $\pi(a|s) \leftarrow
+                    \begin{cases}
+                        1 &\text{if $a=a^*$} \\
+                        0 &\text{otherwise}
+                    \end{cases}$\;
+                }
+            }
+            \Return{$v$, $\pi$}
+        }
