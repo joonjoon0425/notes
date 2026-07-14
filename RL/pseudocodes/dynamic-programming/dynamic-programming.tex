@@ -1,0 +1,81 @@
+\section{Introduction}
+This chapter discuss and dyamic programming algorithms for finding optimal policies.
+Since these are dynamic prgramming algorithms, a perfect system model is required; this mean that
+it is rarely used in practice, but these algorithms important foundations of the model-free algorithms.
+Three algorithms will be presented;
+\begin{itemize}
+    \item Value Iteration: The algorithms suggested by the contraction mapping theorem \ref{thm:SolutionBellmanOptEq};
+    \item Policy Iteration:
+    \item Trucated Policy Iteration: The unified algorithm which includes value iteration and policy iteration as its special cases.
+\end{itemize}
+
+\section{Value Iteration}
+    \subsection{Main Idea}
+        The main idea of \textbf{value iteration} algorithms is the algorithms suggested in Theorem \ref{thm:SolutionBellmanOptEq}.
+        In particular, the algorithms is
+        \begin{equation}
+            v_{k+1} = \max_{\pi \in \Pi}{(r_\pi + \gamma P_\pi v_k)},\quad k=0,1,2,\dots
+        \end{equation}
+        Breaking down, this iterative algorithm has two steps;
+        \begin{enumerate}
+            \item \emph{Policy Update}: The algorithm finds a policy $\pi_{k+1}$ that solves following optimization problem;
+                \begin{equation}
+                    \arg\max_\pi(r_\pi + \gamma P_\pi v_k)
+                \end{equation}
+            \item \emph{Value Update}: With the policy $\pi_{k+1}$, the algorithm calculates a new state value function $v_{k+1}$;
+                \begin{equation}
+                    v_{k+1} = r_{\pi_{k+1}} + \gamma P_{\pi_{k+1}} v_k
+                \end{equation} and this $v_{k+1}$ is used in next iteration.
+        \end{enumerate}
+    \subsection{Pseudocode}
+        \Algorithm{valueIter}
+        {Value Iteration Algorithm}
+        {\inputitem{$p(s',r|s,a)$}{the dynamics of the system} \\
+         \inputitem{$v$}{initial guess}}
+        {\inputitem{$v^*,\pi^*$}{optimal state value and optimal policy}}
+        {
+            $\pi \leftarrow$ greedy policy derived from $v$\;
+            \Repeat{convergence}
+            {
+                \For{$s \in \mathcal{S}$} {
+                    \For{$a \in \mathcal{A}(s)$} {
+                        $q(s,a) \leftarrow \sum_r p(r|s,a)r + \gamma \sum_{s'}p(s'|s,a)v(s')$\;
+                    }
+                    $a^* \leftarrow \arg\max_a q(s,a)$\;
+                    \tcp{policy update}
+                    $\pi(s,a)=
+                    \begin{cases}
+                        1 &\text{if $a$ = $a^*$} \\
+                        0 &\text{otherwise}
+                    \end{cases}$\;
+                    \tcp{value update}
+                    $v(s) = \max_a{q(s,a)}$\;
+                }
+            }
+            \Return{$v$, $\pi$}
+        }
+        Note that the value update of Algorithm \ref{alg:valueIter} is simply substituting the original state values with
+        maximum action values since we are using greedy policy.
+    \subsection{Convergence}
+        The convergence can be proved with Theorem \ref{thm:ContractMap} and Theorem \ref{thm:ContPropBellmanOptEq}.
+\section{Policy Iteration}
+    \subsection{Main Idea}
+        The \textbf{policy iteration} is based on the policy improvement theorem. 
+        Like value iteration, the policy iteration consists of two steps:
+        \begin{enumerate}
+            \item \emph{Policy Evaluation}: For a given policy $\pi_k$, we calculate the corresponding state values by solving following Bellman equation:
+                \begin{equation}
+                    v_{\pi_k} = r_{\pi_k} + \gamma P_{\pi_k}v_{\pi_k}
+                \end{equation}
+            \item \emph{Policy Improvement}: Using the computed state value $v_k$, we obtain the improved policy as
+                \begin{equation}
+                    \pi_{k+1} = \arg\max_\pi(r_\pi + \gamma P_\pi v_{\pi_k})
+                \end{equation} and here is where the policy improvement theorem is applied.
+        \end{enumerate}
+        The difference is that the value iteration is that instead of taking a state value and computing the policy from it,
+        the policy iteration takes a policy and compute the value corresponding to the policy.
+
+        Also, note that policy iteration has another iterative algorithm inside it: the policy evaluation uses iterative algorithm for solving the
+        Bellman equation $v_{\pi_k} = r_{\pi_k} + \gamma P_{\pi_k}v_{\pi_k}$.
+
+        

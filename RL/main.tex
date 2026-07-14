@@ -4,7 +4,7 @@
 \usepackage{tocloft}
 \addbibresource{references.bib}
 \setlength{\cftbeforesecskip}{0.3em}
-\setcounter{tocdepth}{1}
+\setcounter{tocdepth}{2}
 
 \title{Reinforcement Learning}
 \author{Hyoung Joon, Kim}
@@ -23,6 +23,8 @@
             \item \cite{Zhao2025};
         \end{itemize}
 \part{Algorithms}
+    \chapter{Dynamic Programming}
+    \input{pseudocodes/dynamic-programming/dynamic-programming.tex}
     \chapter{Value-based Methods}
     \chapter{Policy-based Methods}
     \input{pseudocodes/policy-based/policy-based.tex}
@@ -34,8 +36,8 @@
     \input{theories/bellman-eq.tex}
     \chapter{Bellman Optimality Equation}
     \input{theories/bellmanopt-eq.tex}
-    \chapter{Value Iteration and Policy Iteration}
-    \input{theories/iteration.tex}
+    \chapter{Policy Improvement Theorem}
+    \input{theories/policy-improvement.tex}
 \part{Appendices}
     \chapter{Probability Theory}
     \input{appendices/prob.tex}
