@@ -1,0 +1,77 @@
+\section{Monte Carlo with Exploring Starts}
+    \subsection{Main Idea}
+        The MC-Basic algorithms is not sample-efficient, since it only updates only q value of
+        one state-action pair each episode. To deal with this low efficiency, we use all the
+        \emph{visit} to the state-action pair in each episode.
+
+        Suppose that the agent has gone through following trajectory:
+        \begin{equation}
+            s_1 \xrightarrow{a_1} s_2 \xrightarrow{a_2} s_3 \xrightarrow{a_3} s_4 \xrightarrow{a_4} \dots
+        \end{equation}
+        To increase the sample efficiency, we use the visits to the state-action pairs in the trajectory.
+        That is, using the above episode, we not only use $(s_1,a_1)$ for estimating $q(s_1,a_1)$ but use $(s_2,a_2)$ for estimating $q(s_2,a_2)$, and so on.
+        There are two different ways to do this:
+        \begin{itemize}
+            \item The first way is to only use the state-action pairs when it is first encountered. This is called \emph{first-visit method};
+            \item The second way is to use all the visit to the state-action pairs. This is called \emph{every-visit method}.
+        \end{itemize}
+
+        Also, we update the estimate of q values after each episode ends. This falls into the scope of \emph{generalized policy iteration},
+        since we are using the value approximation even it is not so accurate.
+    \subsection{Pseudocode}
+        \Algorithm{mc-explore}
+        {Monte Carlo with Exploring Starts (every-visit)}
+        {
+            \inputitem{$\pi_0$}{initial policy}
+        }
+        {
+            \inputitem{$\pi^*$}{optimal policy}
+        }
+        {
+            \tcp{initialize}
+            \ForEach{valid state-action pair $(s,a)$}
+            {
+                $\pi \leftarrow \pi_0$\;
+                $q(s,a) \leftarrow$ initial value\;
+                \tcp{holds the sum of returns of (sub)episode starting from $(s,a)$}
+                $\text{Ret}(s,a) \leftarrow 0$\;
+                \tcp{counts the number of visits of $(s,a)$}
+                $\text{N}(s,a) \leftarrow 0$\;
+            }
+            \Repeat{convergence}
+            {
+                select a starting valid state-action pair $(s,a)$, ensuring that all the pairs can be possibly selected\;
+                generate an episode starting from $(s,a)$, following current policy $\pi$: $s_0, a_0, r_1, s_1, a_1, \dots, s_{T-1}, a_{T-1}, r_T$\;
+                $G \leftarrow 0$\;
+                \For{$t=T-1,T-2,\dots,0$}
+                {
+                    $G \leftarrow r_{t+1} + \gamma G$\;
+                    $\text{Ret}(s,a) \leftarrow \text{Ret}(s,a) + G$\;
+                    $\text{N}(s,a) \leftarrow \text{N}(s,a) + 1$\;
+                    \tcp{policy evaluation}
+                    $q(s_t,a_t) \leftarrow \frac{\text{Ret}(s,a)}{\text{N}(s,a)}$\;
+                    \tcp{policy improvement}
+                    $\pi_{k+1}(a|s) = \begin{cases}
+                        1 &\text{if $a=\arg\max_{a'}{q_{\pi_k}(s,a')}$} \\
+                        0 &\text{otherwise}
+                    \end{cases}$\;
+                }
+            }
+        }
+        
+    \subsection{Implementation Details}
+        The exploring-start condition can be achieved by random start state.
+
+    \subsection{Pros and Cons}
+    Pros:
+    \begin{itemize}
+        \item Better sample efficiency then MC-Basic;
+        \item All state-action pairs can be visited due to the exploring-start, and this makes the estimation more accurate.
+    \end{itemize}
+    Cons:
+    \begin{itemize}
+        \item Only applicable to episodic tasks, which is a common drawback for all MC methods. This property leads to following problem, too;
+        \item High variance since the return holds all the noises and randomnesses, and the return is used for update;
+        \item If the exploring start condition cannot be satisfied, the MC with Exploring Starts cannot be used. This is common in real-world problems.
+        To deal with this, another algorithms without exploring starts will be introduced next section;
+    \end{itemize}

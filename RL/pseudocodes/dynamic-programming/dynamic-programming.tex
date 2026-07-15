@@ -41,11 +41,10 @@ Three algorithms will be presented;
                     \For{$a \in \mathcal{A}(s)$} {
                         $q(s,a) \leftarrow \sum_r p(r|s,a)r + \gamma \sum_{s'}p(s'|s,a)v(s')$\;
                     }
-                    $a^* \leftarrow \arg\max_a q(s,a)$\;
                     \tcp{policy update}
-                    $\pi(s|a)=
+                    $\pi(a|s)=
                     \begin{cases}
-                        1 &\text{if $a$ = $a^*$} \\
+                        1 &\text{if $a = \arg\max_a q(s,a)$} \\
                         0 &\text{otherwise}
                     \end{cases}$\;
                     \tcp{value update}
@@ -119,7 +118,8 @@ Three algorithms will be presented;
     \subsection{Main Idea}
         The \textbf{truncated policy iteration} is a more general algorithm including value iteration and policy iteration as its special cases.
         The algorithm has only one difference with policy iteration: in the policy evaluation step, the truncated policy iteration iterates only finite times,
-        even when the convergence condition is not met.
+        even when the convergence condition is not met. Truncated policy iteration algorithm is one of the instances of \textbf{general policy iteration}, which is
+        an abstract concept of interleaving evaluation and improvement.
         
         The perspective of looking at the truncated policy iteration as the generalization of policy iteration and value iteration
         can be derived from the similiarity between value iteration and policy iteration.
@@ -137,8 +137,8 @@ Three algorithms will be presented;
         While value iteration computes only once and update the state value and policy iteration iterates until convergence and use it as state value of policy,
         the truncated policy iteration iterates only finite number of times.
     \subsection{Pseudocode}
-        \Algorithm{policyIter}
-        {Policy Iteration Algorithm}
+        \Algorithm{truncPolicyIter}
+        {Truncated Policy Iteration Algorithm}
         {\inputitem{$p(s',r|s,a)$}{the dynamics of the system} \\
          \inputitem{$\pi$}{initial guess}}
         {\inputitem{$v^*,\pi^*$}{optimal state value and optimal policy}}
@@ -172,3 +172,5 @@ Three algorithms will be presented;
             }
             \Return{$v$, $\pi$}
         }
+    \subsection{Convergence}
+    TODO: Convergence proof of truncated policy iteration.

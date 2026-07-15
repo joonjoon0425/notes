@@ -1,0 +1,11 @@
+\section{Introduction}
+This chapter introduces a \textbf{Monte Carlo methods} for reinforcement learning.
+These algorithms all starts from trying to obtain the optimal policy by solving the Bellman optimality equation.
+The difference of pure dynamic programming algorithms and Monte Carlo methods is that the latter
+do not require a perfect dynamics of the model, i.e., it is \emph{model-free}.
+
+Then, how do we get the optimal policy without a perfect model? We use the data that the model gives us.
+Using the data, we can convert the policy iteration algorithm~\ref{alg:policyIter} to the model-free version.
+Specifically, we estimate the action value $q(s,a)=\E[G_t|S_t=a,A_t=a]$ using Monte Carlo sampling.
+\input{pseudocodes/mc/mc-basic.tex}
+\input{pseudocodes/mc/mc-exploring.tex}

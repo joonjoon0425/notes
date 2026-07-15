@@ -65,7 +65,7 @@ In this section, we discuss common concepts that are used frequently in reinforc
                 \item $\mathcal{S}$ is the state space, $\mathcal{A}(s)$ is the action space associated with state $s$, and $\mathcal{R}(s,a)$ is a set of rewards, associated with each state-action pair $(s,a)$.
                 \item $p(s',r|s,a)$ is the dynamics of the model, which is as probability of moving to state $s'$ from $s$ by taking action $a$, and obtaining reward $r$.
                 Note that the state transition probability and the reward probability can be decribed with dynamics. See \ref{rem:dynamics}
-                \item $\pi(s|a)$ is the policy, a probability of agent choosing action $a$ in state $s$.
+                \item $\pi(a|s)$ is the policy, a probability of agent choosing action $a$ in state $s$.
                 \item $\gamma$ is the discount rate.
             \end{itemize}
             with the dynamics satisfying the \emph{Markov property}:

@@ -1,0 +1,45 @@
+\section{Monte Carlo Basic}
+    \subsection{Main Idea}
+        The \textbf{Monte Carlo basic} is the simplest Monte Carlo method algorithm.
+        Suppose that we run the agent starting from state-action pair $(s,a)$, following policy $\pi$, and let $g_\pi^{(i)}(s,a)$
+        be the return of the episode. Then, we can approximate the action value $q_\pi(s,a)$ as following:
+        \begin{equation}
+            q_\pi(s,a) = \E[G_t|S_t=s,A_t=a] \approx \frac{1}{n} \sum_{i=1}^n g_\pi^{(i)}(s,a).
+        \end{equation}
+        If the number $n$ is sufficiently large, the approximation will be sufficiently accurate. This can be guaranteed due to the law of large numbers.
+    \subsection{Pseudocode}
+        \Algorithm{mcBasic}
+        {Monte Carlo Basic}
+        {
+            \inputitem{$\pi_0$}{initial guess}
+        }
+        {
+            \inputitem{$\pi^*$}{optimal policy}
+        }
+        {
+            \Repeat{convergence of $\pi$}
+            {
+                \ForEach{$s \in \mathcal{S}$}
+                {
+                    \ForEach{$a \in \mathcal{A}(s)$}
+                    {
+                        \tcp{policy evaluation}
+                        collect sufficiently many episodes starting from $(s,a)$, following policy $\pi_k$\;
+                        $q_{\pi_k}(s,a) \leftarrow$ the average return of all episodes starting from $(s,a)$\;
+                    }
+                }
+                \tcp{policy improvement}
+                $\pi_{k+1}(a|s) = \begin{cases}
+                    1 &\text{if $a=\arg\max_{a'}{q_{\pi_k}(s,a')}$} \\
+                    0 &\text{otherwise}
+                \end{cases}$\;
+            }
+            \Return{$\pi$}
+        }
+    \subsection{Convergence}
+    \subsection{Pros and Cons}
+        Cons:
+        \begin{itemize}
+            \item Very inefficient sample usage. Due to this property, MC-Basic is not used in practical.
+                To deal with this, we use MC with exploring start, which is presented in next section.
+        \end{itemize}

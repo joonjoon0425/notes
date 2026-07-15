@@ -73,7 +73,7 @@
             \textit{Part 1.} (Convergence) The sequence $\{x_k\}$ defined as $x_{k+1}=f(x_k)$ converges.
 
             We show that the sequence $\{x_k\}$ is a Cauchy sequence; i.e., there always exists an $N \in \mathcal{N}$ such that $\|x_m-x_n\| < \epsilon$ for any $\epsilon > 0$.
-            The Cauchy sequence has a nice property; the Cauchy sequence always converges. This can be proved by using the properties of $\mathcal{R}$, that the $\mathcal{R}$ is a compact set.
+            The Cauchy sequence has a nice property; the Cauchy sequence always converges. This can be proved by using the properties of $\mathcal{R}$, that the $\mathcal{R}$ is a complete set.
             We won't show this here. The following holds:
             \begin{align}
                 \|x_{k+1}-x_k\| = &\|f(x_k) - f(x_{k-1})\| \\
@@ -200,15 +200,15 @@
         where $q^*(s,a) = \sum_{r \in \mathcal{R}}p(r|s,a)r + \gamma \sum_{s' \in \mathcal{S}}p(s'|s,a)v^*(s')$.
     \end{thm}
     \begin{proof}
-        From Theorem \ref{thm:SolutionBellmanOptEq} and \ref{defn:BellOptEq}, we see that
+        From Theorem~\ref{thm:SolutionBellmanOptEq} and~\ref{defn:BellOptEq}, we see that
         \begin{align}
             v^*(s) &= \max_{\pi \in \Pi}\sum_{a \in \mathcal{A}}\pi(a|s)q^*(s,a) \\
                         &\leq \left(\max_{\pi \in \Pi}\sum_{a \in \mathcal{A}}\pi(a|s)\right) \max_{a'} q^*(s,a') \label{tmpeq:2} \\
                         &= \max_{a'}q^*(s,a')
         \end{align}
-        and the given deterministic policy $\pi^*$ satisfies the equality of inequality \ref{tmpeq:2}.
+        and the given deterministic policy $\pi^*$ satisfies the equality of inequality~\ref{tmpeq:2}.
     \end{proof}
-    The important truth is that the optimal state value is unique but the optimal policy is not. The Theorem \ref{thm:GreedyOptPol}
+    The important truth is that the optimal state value is unique but the optimal policy is not. The Theorem~\ref{thm:GreedyOptPol}
     only shows that there always exists at least one deterministic optimal policy. There still can be other optimal policies, too, stochastic or whatever.
 
 \section{Factors that Influence Optimal Policies}
