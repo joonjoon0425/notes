@@ -88,7 +88,7 @@
                 \|x_m - x_n\| &\leq \|x_m - x_{m-1}\| + \|x_{m-1} - x_{m-2}\| + \cdots + \|x_{n+1} - x_n\| \\
                               &\leq \gamma^{m-1}\|x_1-x_0\| + \gamma^{m-2}\|x_1-x_0\| + \dots + \gamma^{n}\|x_1-x_0\| \\
                               &= \|x_1-x_0\| (\gamma^{m-1} + \gamma^{m-2} + \dots + \gamma^n) \\
-                              &= \|x_1-x_0\| \frac{\gamma^n(1-\gamma^{m-n-2})}{1-\gamma} \\
+                              &= \|x_1-x_0\| \frac{\gamma^n(1-\gamma^{m-n})}{1-\gamma} \\
                               &\leq \|x_1-x_0\| \frac{\gamma^n}{1-\gamma}
             \end{align}
             where $m \geq n$, without loss of generality. Since $\gamma \in (0,1)$, the last line converges to 0. That is, the sequence $\{x_k\}$ is a Cauchy sequence.
