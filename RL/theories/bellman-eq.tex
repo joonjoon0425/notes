@@ -181,3 +181,26 @@ All reinforcement learning algorithms are designed to solve this equation.
         \begin{proof}
             Use the Remark \ref{rem:ActionValProp}. For the matrix-vector form, try to derive it, as we did in Theorem \ref{thm:MVFormBellmanEq}.
         \end{proof}
+    \subsection{Greedy Policy and $\varepsilon$-greedy Policy}
+        Now, since we have learned about action values, we can define several frequently used policies that depends on action values.
+        \begin{defn}{Greedy Policy}{greedyPolicy}
+            The \textbf{greedy policy} always selects the action with highest action value. That is, given an action-value function $q(s,a)$,
+            the greedy policy $\pi$ is defined as following:
+            \begin{equation}
+                \pi(a|s) = \begin{cases}
+                    1 &\text{if } a = \arg\max_{a'}{q(s,a)} \\
+                    0 &\text{otherwise}
+                \end{cases}
+            \end{equation}
+        \end{defn}
+
+        \begin{defn}{$\varepsilon$-greedy Policy}{epsGreedyPolicy}
+            The \textbf{$\varepsilon$-greedy policy} always selects the greedy action, but with probability $\varepsilon$, it picks action randomly. That is, given an action-value function $q(s,a)$,
+            the $\varepsilon$-greedy policy $\pi$ is defined as following:
+            \begin{equation}
+                \pi(a|s) = \begin{cases}
+                    1 - \varepsilon + \frac{\varepsilon}{|\mathcal{A}(s)|} &\text{if } a = \arg\max_{a'}{q(s,a)} \\
+                    \frac{\varepsilon}{|\mathcal{A}(s)|} &\text{otherwise}
+                \end{cases}
+            \end{equation}
+        \end{defn}

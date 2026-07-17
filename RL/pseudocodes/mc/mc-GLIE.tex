@@ -1,0 +1,85 @@
+\section{Monte Carlo without Exploring Starts}
+    \subsection{Main Idea}
+        To deal with the exploring starts, we use $\varepsilon$-greedy function for exploring.
+        That is, instead of using the greedy policy for training, we train the $\varepsilon$-greedy policy.
+        This little probability of choosing non-greedy action is required, since the greedy action we have depends
+        only on current informations. That is, there can be a better choice of action selection, since the action values
+        are not perfectly known. Actually, balancing the choice of greedy and non-greedy action is a very
+        important problem in reinforcement learning. This problem is called the problem of \textbf{exploitation}
+        and \textbf{exploration}.
+        \begin{rem}{Problem of Exploitation and Exploration}{ExploitExplor}
+            To \textbf{exploit} is to use the current information and select the greedy action.
+            To \textbf{explore} is to select the action other than greedy action. Since the true state values cannot be known in
+            training, the action that looks greedy may not lead to the highest total reward.
+            If the agent exploits too much, the agent may find only suboptimal policies.
+            If the agent explores too much, the agent won't be able to find the optimal policy.
+            As aforementioned, the balance between exploitation and exploration is critical.
+        \end{rem}
+
+    \subsection{Pseudocode}
+        \Algorithm{mc-EpsGreedy}
+        {Monte Carlo with $\varepsilon$-greedy policy}
+        {
+            \inputitem{$\pi_0$}{initial policy} \\
+            \inputitem{$\varepsilon \in (0,1)$}{probability of exploration}
+        }
+        {
+            \inputitem{$\pi^*$}{optimal policy}
+        }
+        {
+            \tcp{initialize}
+            \ForEach{valid state-action pair $(s,a)$}
+            {
+                $\pi \leftarrow \pi_0$\;
+                $q(s,a) \leftarrow$ initial value\;
+                \tcp{holds the sum of returns of (sub)episode starting from $(s,a)$}
+                $\text{Ret}(s,a) \leftarrow 0$\;
+                \tcp{counts the number of visits of $(s,a)$}
+                $\text{N}(s,a) \leftarrow 0$\;
+            }
+            \Repeat{convergence}
+            {
+                select a starting valid state-action pair $(s,a)$\;
+                generate an episode starting from $(s,a)$, following current policy $\pi$: $s_0, a_0, r_1, s_1, a_1, \dots, s_{T-1}, a_{T-1}, r_T$\;
+                $G \leftarrow 0$\;
+                \For{$t=T-1,T-2,\dots,0$}
+                {
+                    $G \leftarrow r_{t+1} + \gamma G$\;
+                    $\text{Ret}(s,a) \leftarrow \text{Ret}(s,a) + G$\;
+                    $\text{N}(s,a) \leftarrow \text{N}(s,a) + 1$\;
+                    \tcp{policy evaluation}
+                    $q(s_t,a_t) \leftarrow \frac{\text{Ret}(s,a)}{\text{N}(s,a)}$\;
+                    \tcp{policy improvement}
+                    $\pi_{k+1}(a|s) = \begin{cases}
+                        1 - \varepsilon + \frac{\varepsilon}{|\mathcal{A}(s)|} &\text{if } a = \arg\max_{a'}{q(s,a)} \\
+                        \frac{\varepsilon}{|\mathcal{A}(s)|} &\text{otherwise}
+                    \end{cases}$\;
+                }
+            }
+        }
+        
+    \subsection{Implementation Details}
+        The problem with $\varepsilon$-greedy policy is that it even if the trained policy is optimal in the
+        spaces of $\varepsilon$-greedy policies, the policy still has a probability of exploration. To deal with this,
+        $\varepsilon$-greedy policy with GLIE (Greedy in the Limit with Infinite Exploration).
+        \begin{defn}{GLIE Condition}{glie}
+            When following two conditions are satisfied, the policy is called GLIE.
+            \begin{itemize}
+                \item Infinite Exploration: Every state-action pair must be visited and explored infinitely many times as the training steps go to infinity (i.e., $t \to \infty$).
+                \item Limit Greediness: As the learning agent experiences more of the environment, the policy must gradually shift from random exploration to exploiting what it knows, eventually converging entirely to a greedy (optimal) policy.
+            \end{itemize}
+        \end{defn}
+        The most simple way to establish this condition is to use $\varepsilon$-greedy policy with decreasing $\varepsilon$. We can decay the $\varepsilon$ linearly, exponentailly or whatever.
+        TODO: search for several GLIE policies.
+
+    \subsection{Pros and Cons}
+        Pros:
+        \begin{itemize}
+            \item Better sample efficiency then MC-Basic;
+            \item Does not require exploring starts, and still explores sufficiently;
+        \end{itemize}
+        Cons:
+        \begin{itemize}
+            \item Only applicable to episodic tasks, which is a common drawback for all MC methods. This property leads to following problem, too;
+            \item High variance since the return holds all the noises and randomnesses, and that return is used for update;
+        \end{itemize}
