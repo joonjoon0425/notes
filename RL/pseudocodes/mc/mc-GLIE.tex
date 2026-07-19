@@ -45,12 +45,12 @@
                 \For{$t=T-1,T-2,\dots,0$}
                 {
                     $G \leftarrow r_{t+1} + \gamma G$\;
-                    $\text{Ret}(s,a) \leftarrow \text{Ret}(s,a) + G$\;
-                    $\text{N}(s,a) \leftarrow \text{N}(s,a) + 1$\;
+                    $\text{Ret}(s_t,a_t) \leftarrow \text{Ret}(s_t,a_t) + G$\;
+                    $\text{N}(s_t,a_t) \leftarrow \text{N}(s_t,a_t) + 1$\;
                     \tcp{policy evaluation}
-                    $q(s_t,a_t) \leftarrow \frac{\text{Ret}(s,a)}{\text{N}(s,a)}$\;
+                    $q(s_t,a_t) \leftarrow \frac{\text{Ret}(s_t,a_t)}{\text{N}(s_t,a_t)}$\;
                     \tcp{policy improvement}
-                    $\pi_{k+1}(a|s) = \begin{cases}
+                    $\pi_{k+1}(a_t|s_t) = \begin{cases}
                         1 - \varepsilon + \frac{\varepsilon}{|\mathcal{A}(s)|} &\text{if } a = \arg\max_{a'}{q(s,a)} \\
                         \frac{\varepsilon}{|\mathcal{A}(s)|} &\text{otherwise}
                     \end{cases}$\;
@@ -71,6 +71,13 @@
         \end{defn}
         The most simple way to establish this condition is to use $\varepsilon$-greedy policy with decreasing $\varepsilon$. We can decay the $\varepsilon$ linearly, exponentailly or whatever.
         TODO: search for several GLIE policies.
+
+        According to the approximation theories in Chapter \ref{ch:stochasticApprox}, we can also estimate the state values using the stochastic approximation, without using the Ret$(s,a)$ and N$(s,a)$ in Algorithm \ref{alg:mc-EpsGreedy}.
+        The mainly used approximation is to update the action value as
+        \begin{equation}
+            q(s_t,a_t) \leftarrow q(s_t, a_t) + \alpha(G_t - q(s_t,a_t))
+        \end{equation}
+        where $\alpha$ is a fixed constant.
 
     \subsection{Pros and Cons}
         Pros:

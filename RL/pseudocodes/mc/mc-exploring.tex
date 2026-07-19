@@ -46,12 +46,12 @@
                 \For{$t=T-1,T-2,\dots,0$}
                 {
                     $G \leftarrow r_{t+1} + \gamma G$\;
-                    $\text{Ret}(s,a) \leftarrow \text{Ret}(s,a) + G$\;
-                    $\text{N}(s,a) \leftarrow \text{N}(s,a) + 1$\;
+                    $\text{Ret}(s_t,a_t) \leftarrow \text{Ret}(s_t,a_t) + G$\;
+                    $\text{N}(s_t,a_t) \leftarrow \text{N}(s_t,a_t) + 1$\;
                     \tcp{policy evaluation}
-                    $q(s_t,a_t) \leftarrow \frac{\text{Ret}(s,a)}{\text{N}(s,a)}$\;
+                    $q(s_t,a_t) \leftarrow \frac{\text{Ret}(s_t,a_t)}{\text{N}(s_t,a_t)}$\;
                     \tcp{policy improvement}
-                    $\pi_{k+1}(a|s) = \begin{cases}
+                    $\pi_{k+1}(a_t|s_t) = \begin{cases}
                         1 &\text{if $a=\arg\max_{a'}{q_{\pi_k}(s,a')}$} \\
                         0 &\text{otherwise}
                     \end{cases}$\;

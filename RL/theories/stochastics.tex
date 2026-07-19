@@ -1,0 +1,28 @@
+\section{Introduction}
+This chapter introduced several stochastic approximation theorems, which is a theoretic foundation for TD-Learning algorithms.
+    \subsection{Robbins-Monro Algorithm}
+        Suppose we want to find the root of the equation
+        \begin{equation}
+            g(w) = 0.
+        \end{equation}
+        There are many other iterative algorithms for finding the root of a given equation. Then, why do we need
+        stochastic approximation? In real world problems, the expression of function $g$ or its derivative is unknown,
+        and we may even only be able to obtained the noisy observations of $g$. That is, with the original $g$ and noise $\eta$,
+        we can only observe $\tilde{g}(w,\eta) = g(w) + \eta$. The SGD method is one of the most well-known solution to problems like this.
+        But here, we introduce a more general algorithms of stochastic approximation, called \textbf{Robbins-Monro algorithm}.
+
+        \begin{thm}{Robbins-Monro Algorithm}{RMalg}
+            Let $g$ be a function and let $\tilde{g}(w, \eta) = g(w) + \eta$ where $\eta$ is a random noise.
+            Then, the sequence $\{w_k\}$ defined as $w_{k+1} = w_k - a_k \tilde{g}(w_k, \eta_k)$
+            where $\{a_k\}$ is a sequence of positive coefficients almost surely converges to the root of equation $g(w)=0$
+            under following conditions:
+            \begin{enumerate}
+                \item $0 < c_1 \leq \nabla_w g(w) \leq c_2$ for all $w$;
+                \item $\sum_{k=1}^{\infty}a_k = \infty$ and $\sum_{k=1}^{\infty}a_k^2 < \infty$;
+                \item $\E[\eta_k|\mathcal{H}_k]=0$ and $\E[\eta_k^2|\mathcal{H}_k] < \infty$; 
+            \end{enumerate}
+            where $\mathcal{H}_k = \{w_k, w_{k-1}, \dots\}$.
+        \end{thm}
+        \begin{proof}
+        TODO: proof of RM algorithm
+        \end{proof}
