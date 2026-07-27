@@ -1,0 +1,80 @@
+\section{Sarsa}
+    Now, we introduce the most basic TD-algorithm, the \textbf{Sarsa}. Its name originates from the
+    tuple $(s,a,r,s',a')$ it uses.
+    
+    In the last section, the TD algorithm of learning state value was mainly discussed. Here, we directly learn the
+    action values instead of state values, since it can be combined with a policy improvement step to learn optimal policies.
+    \subsection{Main Idea}
+        Suppose we have trajectory generated from policy $\pi$: $(s_0,a_0,r_1,s_1,a_1,\dots,s_t,a_t,r_{t+1},s+{t+1},a_{t+1},\dots).$
+        Note that the trajectory does not have to end. We use following TD-update every step for estimating the action values:
+        \begin{align}
+            q_{t+1}(s_t,a_t) &= q_t(s_t,a_t) + \alpha_t(s_t,a_t)\Big[ r_{t+1} + \gamma q_t(s_{t+1},a_{t+1}) - q_t(s_t,a_t) \Big] \\
+            q_{t+1}(s,a) &= q_t(s,a),\text{ for all }(s,a) \neq (s_t,a_t)
+        \end{align}    
+
+        In fact, the Sarsa solves following Bellman equation in a stochastic approximation manner.
+        \begin{equation}
+            q_\pi(s,a) = \E[R + \gamma q_\pi(S',A')|s,a] \text{ for all }(s, a) \label{eq:sarsaBellman}
+        \end{equation}
+        Equation \ref{eq:sarsaBellman} is the Bellman equation about action values. The proof is given below.
+        \begin{proof}
+            Note that
+            \begin{align}
+                p(s',a'|s,a) &= p(s'|s,a)p(a'|s',s,a) \\
+                             &= p(s'|s,a)p(a'|s') \text{ (due to the Markov property)} \\
+                             &= p(s'|s,a)\pi(a'|s').
+            \end{align}
+            Using this, the equation of Theorem \ref{thm:BellmanEq-AV} can be written as
+            \begin{equation}
+                q_\pi(s,a) = \sum_{r}rp(r|s,a) + \gamma \sum_{s',a'}q_\pi(s',a')p(s',a'|s,a)
+            \end{equation}
+        \end{proof}
+    \subsection{Pseudocode}
+        \Algorithm{sarsa}
+        {Sarsa}
+        {\inputitem{$\alpha_t(s,a) \in (0,1]$}{step size parameter satisfying RM condition}}
+        {\inputitem{$q_*$}{the optimal policy}}
+        {
+            \tcp{initialize}
+            \ForEach{$(s,a) \in \mathcal{S} \times \mathcal{A}$}
+            {$q(s,a) \leftarrow
+            \begin{cases}
+                \text{arbitrary,} &\text{ if $s \in \mathcal{S}^+$ and $a \in \mathcal{A}(s)$} \\
+                0 &\text{ if $s \in \mathcal{S} \setminus \mathcal{S}^+$}
+            \end{cases}$\;}
+            $\pi \leftarrow$ policy derived from $q$ (e.g. $\varepsilon$-greedy, softmax, GLIE)\;
+
+            \ForEach{episodes}
+            {
+                initialize $s$\;
+                choose action $a$ from $s$ using policy $\pi$\;
+                \Repeat{s is in terminal state}
+                {
+                    take action $a$, observe $r$, $s'$\;
+                    choose action $a'$ from $s'$ using policy derived from $\pi$\;
+                    \tcp{update q value}
+                    $q(s,a) \leftarrow q(s,a) + \alpha_t(s,a) \big[ r + \gamma q(s',a') - q(s,a) \big]$\;
+                    \tcp{update policy}
+                    update $\pi$ according to $q(s,a)$
+                    $s \leftarrow s'$\;
+                    $a \leftarrow a'$\;
+                }
+            }
+            \Return{$q \simeq q_*$}
+        }
+    \subsection{Implementation Detail}
+        I usually intialize q value without taking account the terminal states. While traning the agent, when the agent meets terminal state,
+        I just check it immediatedly and set the $q_t(s_{t+1},a_{t+1}) = 0$. Actually I don't even change the q value of terminal state to 0. I just leave it untouched.
+    \subsection{Convergence}
+        TODO: Convergence of Sarsa
+    \subsection{Pros and Cons}
+        Pros:
+        \begin{itemize}
+            \item It learns safer paths by accounting for penalties from exploratory moves. This can be checked with cliff walking of \cite{Sutton2020}, with comparison to Q-Learning.
+        \end{itemize}
+        Cons:
+        \begin{itemize}
+            \item It learns suboptimal policies first, due to the behavior of search for safe paths in the initial training process.
+            \item The variance can be high, since in the initial training process the q values are very noisy and inaccurate, and the agent use the q value of it directly in the update.
+                This can be dealt with the Expected Sarsa \ref{sec:ExpectedSarsa}.
+        \end{itemize}

@@ -1,0 +1,77 @@
+\section{Q-Learning}
+    In this section we learn another TD-learning algorithm, the \textbf{Q-Learning}.
+    Unlike Sarsa, Q-Learning bootstraps the q value using the maximum action value of current state.
+    \subsection{Main Idea}
+        The Q-Learning uses following update equation for action values:
+        \begin{align}
+            q_{t+1}(s_t,a_t) &= q_t(s_t,a_t) + \alpha_t(s_t,a_t)\Big[ r_{t+1} + \gamma \max_{a \in \mathcal{A}(s_{t+1},a)}{q_t(s_{t+1},a)} - q_t(s_t,a_t) \Big] \\
+            q_{t+1}(s,a) &= q_t(s,a),\text{ for all }(s,a) \neq (s_t,a_t)
+        \end{align}
+
+        The Q-Learning solves following Bellman optimality equation:
+        \begin{equation}
+            q(s,a) = \E\Big[ R_{t+1} + \gamma \max_aq(S_{t+1},a)|S_t=s,A_t=a \Big]
+        \end{equation}
+        \begin{proof}
+            Check for \cite{Zhao2025} pg.140.
+        \end{proof}
+
+        \begin{rem}{On-policy and Off-policy}{onPoloffPol}
+            As one can see, the Sarsa solves Bellman equation and then make policy update, but Q-Learning directly learns the optimal policy.
+            The \textbf{behavior policy}, is used to make the trajectory. The \textbf{target policy} is the policy that learns the optimal policy.
+            When the behavior policy and target policy equals, the algorithms is called \textbf{on-policy} algorithm. If not, it is called \textbf{off-policy}.
+            Off policy can separate the exploration with target policy. The target policy only has to care about choosing the best action in current situation.
+            Since the off-policy uses policy other than its target policy, it requires some techniques such as \textbf{importance sampling} and \textbf{tree-backup} algorithms.
+            These will be covered later.
+            
+            The on-policy algorithms cannot be implemented as an \textbf{offline} fashion, since it requires real-time interaction with environment.
+            The off-policy algorithms, in contrast, can be implemented as an offline or online fashion.
+        \end{rem}
+
+    \subsection{Pseudocode}
+        \Algorithm{qlearning}
+        {Q-Learning}
+        {
+            \inputitem{$\alpha_t(s,a) \in (0,1]$}{step size parameter satisfying RM condition} \\
+            \inputitem{$b$}{behavior policy} \\
+            \inputitem{$\pi$}{target policy}
+        }
+        {
+            \inputitem{$q_*$}{the optimal policy}
+        }
+        {
+            \tcp{initialize}
+            \ForEach{$(s,a) \in \mathcal{S} \times \mathcal{A}$}
+            {$q(s,a) \leftarrow
+            \begin{cases}
+                \text{arbitrary,} &\text{ if $s$ is not in terminal states} \\
+                0 &\text{ if $s$ is in terminal states}
+            \end{cases}$\;}
+            $s \leftarrow$ initialize\;
+            \ForEach{episode} {
+                \Repeat{$s$ is not terminal state} {
+                    choose action $a$ from $s$ using behavior policy $b$\;
+                    observe state $s'$ and reward $r$\;
+                    \tcp{update q value}
+                    $q(s,a) \leftarrow q(s,a) + \alpha_t(s,a)\Big[ r + \gamma \max_a{q(s',a)} - q(s,a) \Big]$
+                    \tcp{update target policy}
+                    update target policy according to $q$\;
+                    $s \leftarrow s'$\;
+                }
+            }
+        }
+    \subsection{Implementation Detail}
+        The behavior policy can be any policy that explores well, but in practice we use decaying $\varepsilon$-greedy due to the convergence rate. (I guess...)
+    \subsection{Convergence}
+        TODO: Convergence of Q-Learning
+    \subsection{Pros and Cons}
+        Pros:
+        \begin{itemize}
+            \item It is off-policy. Whatever the behavior policy does, the target policy learns the optimal policy.
+            \item Does not fears getting penalty, as opposed to Sarsa. This can be checked in \cite{Sutton2020}, cliff walking.
+        \end{itemize}
+        Cons:
+        \begin{itemize}
+            \item Can suffer from \textbf{maximization bias}, since the Q-Learning uses maximum q value for bootstrapping. That is, the agent keeps
+                overestimate the q values, which can lead to slow convergence. For more information, see \cite{Sutton2020}. To cope with this, we can use \textbf{Double Q-Learning}.
+        \end{itemize}

@@ -214,4 +214,22 @@
 \section{Factors that Influence Optimal Policies}
     Now, we analyze the factors of BOE that influences optimal policies. The factors are: reward and discount rate.
     \subsection{Reward}
+        Changing reward can lead to slightly different behavior of policies. For example, in the Figure 3.4(a) of \cite{Zhao2025} (gridworld), one can see that
+        the agent tries to move to the goal even though there are forbidden areas. The forbidden area gives the negative reward, but the cumulative reward is greater than
+        going around the forbidden areas. This is why reward (signal) is important.
     \subsection{Discount Rate}
+        High dicount rate leads to far-sighted agent, and low discount rate leads to short-sighted agent. In the extreme, when $\gamma$, the agent only
+        take into account the immediate reward.
+    \subsection{Invariance of the Optimal Policy}
+        Changing the reward may lead to different optimal policies, but this is not always the case. If we apply the same affine transformation
+        to all rewards, the optimal policy remains the same.
+        \begin{thm}{Optimal Policy Invariance}{OptPolInvariance}
+            Let $v^* \in \mathbb{R}^{|\mathcal{S}|}$ be the optimal state value satisfying $v^* = \max_{\pi \in \Pi}{(r_\pi + \gamma P_\pi v^*)}$.
+            If every reward $r \in \mathcal{R}$ goes through the same affine transformation $\alpha * r + \beta$, where $\alpha, \beta \in \mathbb{R}$ and $\alpha > 0$,
+            the corresponding optimal state value $v'$ is also an affine transformation of $v^*$:
+            \begin{equation}
+                v' = \alpha v^* + \frac{\beta}{1 - \gamma}\mathbb{1}
+            \end{equation}
+            where $\gamma \in (0,1)$ is the discount rate and $\mathbb{1} = [1,\dots,1]^\top$.
+            Due to this property, the optimal policy stays invariant.
+        \end{thm}
