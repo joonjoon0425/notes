@@ -1,0 +1,41 @@
+\section{Introduction}
+    This section introduces a theory of measure-theoretic probability, based on \cite{Brzezniak2007}.
+\section{Measure-Theoretic Probability}
+    \subsection{Basic Definitions}
+        \begin{defn}{$\sigma$-field}{sigma_field}
+            Let $\Omega$ be a non-empty set. A $\sigma$-field on $\Omega$ is a family of subsets of $\Omega$ such that
+            \begin{enumerate}
+                \item the empty set $\emptyset \in \mathcal{F}$;
+                \item if $A \in \mathcal{F}$ then $\Omega \setminus A \in \mathcal{F}$;
+                \item if $A_1, A_2, \dots$ is a sequence of sets in $\mathcal{F}$, then $A_1 \cup A_2 \cup \dots \in \mathcal{F}$ 
+            \end{enumerate}
+        \end{defn}
+        
+        \begin{defn}{Probability Measure}{prob_measure}
+            Let $\mathcal{F}$ be a $\sigma$-field on $\Omega$. A \textbf{probability measure} $P$ is a function $P: \mathcal{F} \to [0,1]$
+            such that
+            \begin{enumerate}
+                \item $P(\Omega)=1$;
+                \item if $A_1, A_2, \dots$ are pairwise disjoint sets ($A_i \cap A_j = \emptyset$ for all $i \neq j$) beloning to $\mathcal{F}$, then
+                \begin{equation}
+                    P(A_1 \cup A_2 \cup \dots) = P(A_1) + P(A_2) + \dots.
+                \end{equation}
+            \end{enumerate}
+            The triple $(\Omega, \mathcal{F}, P)$ is called a \textbf{probability space}. The sets belonging to $\mathcal{F}$ are called \textbf{events}.
+            An event $A$ is said to occur \textbf{almost surely} (a.s.) whenever $P(A)=1$.
+        \end{defn}
+
+        \begin{defn}{Random Variable}{rand_var}
+            Let $\mathcal{F}$ be a $\sigma$-field on $\Omega$. Then a function $\xi:\Omega \to \mathbb{R}$ is said to be
+            $\mathcal{F}$-measurable if the following is satisfied:
+            \begin{equation}
+                \{\xi \in B\} \in \mathcal{F} \text{ for every Borel set }B \in \mathcal{B}(\mathbb{R}).
+            \end{equation}
+            where \textbf{Borel sets} refers to the elements of $\mathcal{B}(\mathbb{R})$ which is the smallest $\sigma$-field containing all intervals in $\mathbb{R}$.
+            If the triple $(\Omega, \mathcal{F}, P)$ is a probability space, then such a function $\xi$ is called a \textbf{random variable}.
+        \end{defn}
+        \begin{rem}{Short-hand Notation for Events}{short_hand_notation}
+            The set of events such as $\{\xi \in B\}$ represents the set $\{\omega \in \Omega | \xi(\omega) \in B\}$.
+        \end{rem}
+        
+    

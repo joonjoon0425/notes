@@ -1,0 +1,29 @@
+\section{Introduction}
+In this chapter, value function approximation methods will be covered. Unlike the tabular methods, the approximate method tries to
+approximate the state value or action value of state-action pairs, using a function. This solves the curse of dimensionality, which is a critical problem for tabular methods.
+
+But there are tradeoffs, too. For example, the convergence property breaks down easily. When off-policy, function approximation, and bootstrapping meets together,
+(\textbf{the deadly triad}, \cite{Sutton2020}), the algorithm lost its convergence property and fails to find optimal policy. There are various ways to solve this problem.
+Some solve this with practical methods (replay buffer, PER, double learning, etc.), and some solve this theoretically (GTD2, Emphatic-TD, etc.).
+I'll try to cover both of them in this note.
+
+\section{TD Learning of State Values based on Function Approximation}
+Methods of estimating the state value with a function approximation is introduced in this section.
+    \subsection{Objective Function}
+        Let $v_\pi(s)$ be the true state value function and let $\hat{v}_\pi(s, w)$ be the approximation of it with a parameter $w$.
+        To find the optimal parameter $w$ which best approximates the true state value function, we minimize the objective function. 
+        In particuluar, the objective function is given as
+        \begin{equation}
+            J(w) = \E[(v_\pi(S) - \hat{v}(S, w))^2],
+        \end{equation}
+        where $S$ is a random variable of state space. Then what is the distribution of a random variable $S$?
+        We can use \emph{stationary distribution} of Markov Process. Stationary distribution of a Markov Process describes the long-term behavior of a Markov decision process.
+        That is, the probability of agent being located at certain state after a long execution can be described by this distribution.
+
+        Let $d_\pi(s)$ be the stationary distribution of the Markov process under policy $\pi$. Then, the objective functon can be written as
+        \begin{equation}
+            J(w) = \sum_{s \in \mathcal{S}}d_\pi(s)(v_\pi(s) - \hat{v}(s, w))^2 \label{eq:stationaryDist}
+        \end{equation}
+        TODO: Why stationary distribution? + Tsitsiklis and van Roy + Chapter 6
+
+\input{pseudocodes/approximation/dqn.tex}
