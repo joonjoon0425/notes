@@ -1,32 +1,144 @@
 \section{Introduction}
-This chapter introduces measure-theoretic probability, convergence and several stochastic approximation theorems, which is a theoretic foundation for TD-Learning algorithms.
-    \subsection{Prerequisite}
-        The subsections ahead requries a basic knowledge about measure-theoretic probability, which are provided in \ref{ch:Prob}.
-        The probability theory was re-established by the measure theory, which enabled to define all the ambiguous concepts of probability theory rigorously.
-        For comprehensive introduction about measure theory, see \cite{Axler2020} and for more information about measure-theoretic probability, see \cite{Brzezniak2007}.
-    \subsection{Robbins-Monro Algorithm}
-        Suppose we want to find the root of the equation
-        \begin{equation}
-            g(w) = 0.
-        \end{equation}
-        There are many other iterative algorithms for finding the root of a given equation. Then, why do we need
-        stochastic approximation? In real world problems, the expression of function $g$ or its derivative is unknown,
-        and we may even only be able to obtained the noisy observations of $g$. That is, with the original $g$ and noise $\eta$,
-        we can only observe $\tilde{g}(w,\eta) = g(w) + \eta$. The SGD method is one of the most well-known solution to problems like this.
-        But here, we introduce a more general algorithms of stochastic approximation, called \textbf{Robbins-Monro algorithm}.
+    This chapter introduces measure-theoretic probability, convergence and several stochastic approximation theorems, which is a theoretic foundation for TD-Learning algorithms.
+\section{Prerequisite}
+    The subsections ahead requries a basic knowledge about measure-theoretic probability, which are provided in \ref{ch:Prob}.
+    The probability theory was re-established by the measure theory, which enabled to define all the ambiguous concepts of probability theory rigorously.
+    For comprehensive introduction about measure theory, see \cite{Axler2020} and for more information about measure-theoretic probability, see \cite{Brzezniak2007}.
+\section{Robbins-Monro Algorithm}
+    Suppose we want to find the root of the equation
+    \begin{equation}
+        g(w) = 0.
+    \end{equation}
+    There are many other iterative algorithms for finding the root of a given equation. Then, why do we need
+    stochastic approximation? In real world problems, the expression of function $g$ or its derivative is unknown,
+    and we may even only be able to obtained the noisy observations of $g$. That is, with the original $g$ and noise $\eta$,
+    we can only observe $\tilde{g}(w,\eta) = g(w) + \eta$. The SGD method is one of the most well-known solution to problems like this.
+    But here, we introduce a more general algorithms of stochastic approximation, called \textbf{Robbins-Monro algorithm}.
 
-        \begin{thm}{Robbins-Monro Algorithm}{RMalg}
-            Let $g$ be a function and let $\tilde{g}(w, \eta) = g(w) + \eta$ where $\eta$ is a random noise.
-            Then, the sequence $\{w_k\}$ defined as $w_{k+1} = w_k - a_k \tilde{g}(w_k, \eta_k)$
-            where $\{a_k\}$ is a sequence of positive coefficients almost surely converges to the root of equation $g(w)=0$
-            under following conditions:
-            \begin{enumerate}
-                \item $0 < c_1 \leq \nabla_w g(w) \leq c_2$ for all $w$;
-                \item $\sum_{k=1}^{\infty}a_k = \infty$ and $\sum_{k=1}^{\infty}a_k^2 < \infty$;
-                \item $\E[\eta_k|\mathcal{H}_k]=0$ and $\E[\eta_k^2|\mathcal{H}_k] < \infty$; 
-            \end{enumerate}
-            where $\mathcal{H}_k = \{w_k, w_{k-1}, \dots\}$.
-        \end{thm}
-        \begin{proof}
-        TODO: proof of RM algorithm
-        \end{proof}
+    \begin{thm}{Robbins-Monro Algorithm}{RMalg}
+        Let $g$ be a function and let $\tilde{g}(w, \eta) = g(w) + \eta$ where $\eta$ is a random noise.
+        Then, the sequence $\{w_k\}$ defined as $w_{k+1} = w_k - a_k \tilde{g}(w_k, \eta_k)$
+        where $\{a_k\}$ is a sequence of positive coefficients almost surely converges to the root of equation $g(w)=0$
+        under following conditions:
+        \begin{enumerate}
+            \item $0 < c_1 \leq \nabla_w g(w) \leq c_2$ for all $w$;
+            \item $\sum_{k=1}^{\infty}a_k = \infty$ and $\sum_{k=1}^{\infty}a_k^2 < \infty$;
+            \item $\E[\eta_k|\mathcal{H}_k]=0$ and $\E[\eta_k^2|\mathcal{H}_k] < \infty$; 
+        \end{enumerate}
+        where $\mathcal{H}_k = \{w_k, w_{k-1}, \dots\}$.
+    \end{thm}
+    \begin{proof}
+        Let $w^*$ be the root of equation $g(w)=0$. The RM algorithm is
+        \begin{align}
+            w_{k+1} &= w_k - a_k\tilde{g}(w_k,\eta_k) \\
+                    &= w_k - a_k[g(w_k) + \eta_k]
+        \end{align}
+        Then, we have
+        \begin{equation}
+            w_{k+1} - w^* = w_k - w^* - a_k[g(w_k)-g(w^*)+\eta_k].
+        \end{equation}
+        and $g(w_k)-g(w^*) = \nabla_wg(w'_k)(w_k-w^*)$ for some $w'_k \in [w_k,w^*]$. Let $\Delta_k = w_k - w^*$. The above equation becomes
+        \begin{align}
+            \Delta_{k+1} &= \Delta_k - a_k\big[ \nabla_wg(w'_k)(w_k-w^*)+\eta_k\big] \\
+                         &= \Delta_k - a_k\nabla_wg(w'_k)\Delta_k + a_k(-\eta_k) \\
+                         &= [1-a_k\nabla_wg(w'_k)]\Delta_k + a_k(-\eta_k).
+        \end{align}
+        Let $\alpha_k = a_k\nabla_wg(w'_k)$. Since $\sum_{k=1}^{\infty}a_k = \infty$ and $\sum_{k=1}^{\infty}a_k^2 < \infty$,
+        and $\nabla_w g(w)$ is bounded, we know that $\sum_{k=1}^{\infty}\alpha_k=\infty$ and $\sum_{k=1}^\infty\alpha_k^2 < \infty$. Thus, all the conditions in
+        Theorem \ref{thm:Dvoretzky} are satisfied and hence $\Delta_k$ converges to zero almost surely.
+    \end{proof}
+
+    \begin{itemize}
+        \item The first condition indicates that $g(w)$ monotonically increases. This ensures that the root of $g(w)$ exists and is unique.
+            When it comes to the optimization problem such as $g(w) = \nabla_w J(w)$, the condition requires the function $J$ to be a \emph{convex} function.
+            Additional $\nabla_w g(w) \leq c_2$ indicates that the gradient $\nabla_w g(w)$ is bounded.
+        \item The second condition means that the sequence $\{a_k\}$ goes to 0 as $k \to \infty$, but not too fast.
+        \item The third condition is mild. It just requires the noise to have mean 0 and to be square-integrable for all $k$.
+    \end{itemize}
+    \begin{rem}{The Second Condition of RM Algorithm}{RMAlgSecondCond}
+        This is an intuitional investigation of the second condition of RM algorithm. Suppose that the observation $\tilde{g}(w_k, \eta_k)$ is always bounded.
+        First, $\sum_{k=1}^\infty a_k^2 < \infty$ indicates that $a_k \to 0$ as $k \to \infty$. Since $w_{k+1} - w_k = -a_k\tilde{G}(w_k, \eta_k)$ and the observation is bounded,
+        $w_{k+1}$ and $w_k$ approach each other as $k \to \infty$.
+
+        Second, $\sum_{k=1}^\infty a_k = \infty$ indicates that $a_k$ should not converge to zero too fast. Using the eqauation $w_{k+1} - w_k = -a_k\tilde{G}(w_k, \eta_k)$
+        with the telescoping sum, we can get
+        \begin{equation}
+            w_1 - w_N = \sum_{k=1}^N a_k \tilde{g}(w_k, \eta_k)
+        \end{equation}
+        If $\sum_{k=1}^\infty a_k < \infty$, then $|\sum_{k=1}^N a_k \tilde{g}(w_k, \eta_k)| \leq b$ for some finite upper bound $b$. Then,
+        \begin{equation}
+            |w_1 - w_N| = |\sum_{k=1}^N a_k \tilde{g}(w_k, \eta_k)| \leq b.
+        \end{equation}
+        This shows that if $\sum_{k=1}^N a_k \tilde{g}(w_k, \eta_k) < \infty$ and $|w_1 - w^*| > b$ for the initial guess $w_1$ and the solution $w^*$, it is impossible to have $w_\infty = w^*$.
+        That is, the condition $\sum_{k=1}^N a_k \tilde{g}(w_k, \eta_k) = \infty$ is necessary to ensure convergencey given an arbitrary initial guess.
+    \end{rem}
+
+    In practice, $a_k$ is usually selected as a sufficiently small constant. This does not satisfies the second condition of RM algorithm, but can still converge in a certain sense, \cite{Zhao2025}.
+\section{Dvoretzky's Convergence Theorem}
+    The proof of Theorem \ref{thm:RMalg} depends on the \textbf{Dvoretzky's Theorem}, which will be introduced in this section.
+    \begin{thm}{Dvoretzky's Theorem}{Dvoretzky}
+        Let $\{\alpha_k\}_{k=1}^\infty$, $\{\beta_k\}_{k=1}^\infty$ and $\{\eta_k\}_{k=1}^\infty$ be a stochastic sequences such that $\alpha_k \geq 0$ and $\beta_k \geq 0$ for all $k$.
+        Then, following sequence converges to zero almost surely
+        \begin{equation}
+            \Delta_{k+1} = (1-\alpha_k)\Delta_k + \beta_k \eta_k
+        \end{equation}
+        if following conditions are satisfied:
+        \begin{enumerate}
+            \item $\sum_{k=1}^\infty \alpha_k = \infty$, $\sum_{k=1}^\infty < \infty$ and $\sum_{k=1}^\infty \beta^2 < \infty$ uniformly almost surely;
+            \item $\E[\eta_k|\mathcal{H}_k]$ and $\E[\eta_k^2|\mathcal{H}_k] \leq C$ almost surely;
+        \end{enumerate}
+        where $\mathcal{H}_k=\{\Delta_k, \Delta_{k-1}, \dots, \eta_{k-1},\dots,\alpha_{k-1},\dots,\beta_{k-1},\dots\}$.
+    \end{thm}
+
+    \begin{proof}
+        The proof is based on the proof of \cite{Zhao2025}, which uses the convergence results of quasimartingales.
+        Note that the theorem is proved only the case when $\alpha_k$ and $\beta_k$ are determined by $\mathcal{H}_k$, for example,
+        when $\alpha_k$ and $\beta_k$ ia a function of $\Delta_k$ or deterministic squences.
+        
+        Let $h_k = \Delta_k^2$. Then,
+        \begin{align}
+            h_{k+1} - h_k &= \Delta_{k+1}^2 - \Delta_k^2 \\
+                          &= (\Delta_{k+1} - \Delta_k) (\Delta_{k+1} + \Delta_k) \\
+                          &= (-\alpha_k\Delta_k + \beta_k\eta_k)\big[ (2-\alpha_k)\Delta_k + \beta_k\eta_k \big] \\
+                          &= -\alpha_k(2-\alpha_k)\Delta_k^2 + \beta_k^2\eta_k^2 + 2 (1-\alpha_k)\beta_k\eta_k\Delta_k.
+        \end{align}
+        Now, take expectations on both sides of the equation. Then,
+        \begin{equation}
+            \E[h_{k+1} - h_k|\mathcal{H}_k] = \E[-e\alpha_k(2-\alpha_k)\Delta_k^2|\mathcal{H}_k] + \E[\beta_k^2\eta_k^2|\mathcal{H}_k] + \E[2(1-\alpha_k)\beta_k\eta_k\Delta_k|\mathcal{H}_k].
+        \end{equation}
+        For simplicity, suppose that $\alpha_k$ and $\beta_k$ are determined by $\mathcal{H}_k$. Then, we can take them out of expectation.
+        \begin{equation}
+            \E[h_{k+1} - h_k|\mathcal{H}_k] = -\alpha_k(2-\alpha_k)\Delta_k^2 + \beta_k^2\E[\eta_k^2|\mathcal{H}_k] + 2(1-\alpha_k)\beta_k\Delta_k\E[\eta_k|\mathcal{H}_k].
+        \end{equation}
+        Using the conditions of the theorem, we can get following results:
+        \begin{itemize}
+            \item $-\alpha_k(2-\alpha_k)\Delta_k^2 \leq 0$ for $k \geq n$, for appropriate $n \in \mathbb{N}$.
+            \item $\beta_k^2\E[\eta_k^2|\mathcal{H}_k] \leq \beta_k^2C$;
+            \item $2(1-\alpha_k)\beta_k\Delta_k\E[\eta_k|\mathcal{H}_k] = 0$;
+        \end{itemize}
+        Therefore, we get
+        \begin{equation}
+            \E[h_{k+1}-h_k|\mathcal{H}_k] = -\alpha_k(2-\alpha_k)\Delta_k^2 + \beta_k^2\E[\eta_k^2|\mathcal{H}_k] \leq \beta_k^2C
+        \end{equation}
+        and hence
+        \begin{equation}
+            \sum_{k=1}^{\infty}\E[h_{k+1}-h_k|\mathcal{H}_k] \leq \sum_{k=1}^\infty\beta_k^2C < \infty.
+        \end{equation}
+        Now, based on the quasimartinagle convergence theorem in (), $h_k = \Delta_k^2$ converges almost surely.
+
+        We now determine where $\Delta_k$ converges to.
+        \begin{equation}
+            \sum_{k=1}^{\infty}\alpha_k(2-\alpha_k)\Delta_k^2 = \sum_{k=1}^{\infty}\beta_k^2\E[\eta_k^2|\mathcal{H}_k] - \sum_{k=1}^{\infty}\E[h_{k+1}-h_k|\mathcal{H}_k].
+        \end{equation}
+        Since the right-hand side is bounded, the left-hand side is also bounded, too. We have
+        \begin{equation}
+            \infty > \sum_{k=n}^{\infty}\alpha_k(2-\alpha_k)\Delta_k^2 \geq \sum_{k=n}^{\infty}\alpha_k\Delta_k^2 \geq 0.
+        \end{equation}
+        Therefore, $\sum_{k=1}^{\infty}\alpha_k\Delta_k^2$ is bounded. Since $\sum_{k=1}^{\infty}\alpha_k = \infty$, we must have $\Delta_k \to 0$ almost surely.
+
+    \end{proof}
+    TODO: Add reference to quasimartingale convergence theorem.
+    \subsection{Extension of Dvoretzky's Theorem}
+        The following theorem extends Dvoretzky's Theorem to multivariate situations.
+        TODO: fix some notations and carify them...
+\section{Stochastic Gradient Descent}
