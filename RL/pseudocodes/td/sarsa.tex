@@ -63,8 +63,8 @@
             \Return{$q \simeq q_*$}
         }
     \subsection{Implementation Detail}
-        I usually intialize q value without taking account the terminal states. While traning the agent, when the agent meets terminal state,
-        I just check it immediatedly and set the $q_t(s_{t+1},a_{t+1}) = 0$. Actually I don't even change the q value of terminal state to 0. I just leave it untouched.
+        I usually intialize q value without minding if the state is terminal or not. While traning the agent, when the agent meets terminal state,
+        I just check it in place and set the $q_t(s_{t+1},a_{t+1}) = 0$. Actually I don't even change the q value of terminal state to 0. I just leave it untouched.
     \subsection{Convergence}
         TODO: Convergence of Sarsa
     \subsection{Pros and Cons}
@@ -74,7 +74,7 @@
         \end{itemize}
         Cons:
         \begin{itemize}
-            \item It learns suboptimal policies first, due to the behavior of search for safe paths in the initial training process.
+            \item It learns suboptimal policies first, due to the behavior of searching for safe paths in the initial training process.
             \item The variance can be high, since in the initial training process the q values are very noisy and inaccurate, and the agent use the q value of it directly in the update.
                 This can be dealt with the Expected Sarsa \ref{sec:ExpectedSarsa}.
         \end{itemize}

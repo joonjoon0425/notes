@@ -6,7 +6,70 @@
     The general algorithm of TD method with state value is given in this section.
     In practice, we use TD method for action values, but the one given here is a foundation of
     them.
-% Fill here later.
+
+    \subsection{Main Idea}
+    Given a policy $\pi$, we estimate the state value with following update equation, along the trajectory
+    $(s_0,r_1,s_1,r_2,\dots,r_t, s_t, \dots)$.
+    \begin{align}
+        v_{t+1}(s_t) &= v_t(s_t) - \alpha_t(s_t)\Big[ v_t(s_t) - (r_{t+1} + \gamma v_t(s_{t+1})) \Big] \label{eq:TDUpdate}\\
+        v_{t+1}(s) &= v_t(s), \text{ for all } s \neq s_t
+    \end{align}
+
+    This equation can be viewed as a certain stochastic approximation of the solution of the Bellman equation.
+
+    \begin{rem}{Derivation of TD-Learning Algorithm}{deriveTDLearn}
+        Recall the definition of Bellman equation of state values (Definition \ref{eq:state-value}).
+        Modifying this equation a bit, we can write this equation as following:
+        \begin{equation}
+            v_\pi(s) = \E[R_{t+1} + \gamma v_\pi(S_{t+1})|S_t=s],\ s \in \mathcal{S}
+        \end{equation}
+
+        Now define the function
+        \begin{equation}
+            g(v_\pi(s_t)) = v_\pi(s_t) - \E[R_{t+1} + \gamma v_\pi(S_{t+1})|S_t=s_t]
+        \end{equation}
+        and then our goal is to solve $g(v_\pi(s_t))=0$ to obtain the state value $v_\pi(s_t)$.
+
+        Since we can get $r_t$ and $s_{t+1}$ in the trajectory, we can get the noisy obervation $\tilde{g}(v_\pi(s_t))$, at the
+        following equation shows the separation of true term and the noise term into linear combination.
+        \begin{align}
+            \tilde{g}(v_\pi(s_t)) &= v_\pi(s_t) - [r_{t+1} + \gamma v_\pi(s_{t+1})] \\
+                                  &= (v_\pi(s_t) - \E[R_{t+1} + \gamma v_\pi(S_{t+1})|S_t=s_t)] \\
+                                  &\qquad + (\E[R_{t+1} + \gamma v_\pi(S_{t+1})|S_t=s_t] - [r_{t+1} + \gamma v_\pi(s_{t+1})]) \\
+                                  &= g(v_\pi(s_t)) + \eta(s_t)
+        \end{align}
+        Therefore the RM algorithm \ref{thm:RMalg} can be applied:
+        \begin{align}
+            v_{t+1}(s_t) &= v_t(s_t) - \alpha_t(s_t)\tilde{g}(v_t(s_t)) \\
+                         &= v_t(s_t) - \alpha_t(s_t)\Big( v_t(s_t) - [r_{t+1} + \gamma v_\pi(s_{t+1})] \Big) \label{eq:TDUpdateDerived}
+        \end{align}
+        Now the only difference between equation \ref{eq:TDUpdate} and equation \ref{eq:TDUpdateDerived} is the bootstrap:
+        equation \ref{eq:TDUpdate} bootstraps (uses $v_t(s_{t+1})$), but the equation \ref{eq:TDUpdateDerived} does not (uses $v_\pi(s_{t+1})$).
+        The equation with bootstrap term still guarantees the almost sure convergence to the solution of $g(v_\pi(s_t))=0$. This is proved in Theorem \ref{thm:convTDalg}.
+    \end{rem}
+
+    \begin{thm}{Convergence of TD Algorithm}{convTDalg}
+        Given a policy $\pi$, by the TD algorithm in equation \ref{eq:TDUpdate}, $v_t(s)$ converges almost surely to $v_\pi(s)$ as $t \to \infty$ for all $s \in \mathcal{S}$
+        if $\sum_t \alpha_t(s) = \infty$ and $\sum_t \alpha_t^2(s) < \infty$ for all $s \in \mathcal{S}$.
+    \end{thm}
+    Note that the condition $\sum_t \alpha_t(s) = \infty$ requires all states to be visited infinitely many times, since $\alpha_t(s) > 0$ if $s$ is visited in time $t$ and $\alpha_t(s) = 0$ if not.
+    \begin{proof}
+        We use the extension Dvoretkzy's Convergence Theorem \ref{thm:DvoretzkyExtenstion}. To do so, we first organize the stochastic processes.
+        Let $\Delta_t(s) = v_t(s) - v_\pi(s)$. Then, 
+        \begin{align}
+            \Delta_{t+1}(s_t) &= (1-\alpha_t(s_t))\Delta_t(s_t) + \alpha_t(s_t)(r_{t+1} + \gamma v_t(s_{t+1}) - v_\pi(s_t)) \\
+                              &= (1-\alpha_t(s_t))\Delta_t(s_t) + \alpha_t(s_t)\eta_t(s_t) \\
+            \Delta_{t+1}(s) = \Delta_t(s) &= (1-\alpha_t(s))\Delta_t(s) + \alpha_t(s)\eta_t(s),\quad s \neq s_t, \text{ where }\alpha_t(s) = 0 \text{ and } \eta_t(s)=0
+        \end{align}
+        Therefore, regardless of whether $s=s_t$, we get unified equation $\Delta_{t+1}(s) = (1-\alpha_t(s))\Delta_t(s) + \alpha_t(s)\eta_t(s)$.
+        To prove this stochastic process converges almost surely to 0 with Theorem \ref{thm:DvoretzkyExtenstion}, we must show that this process statisfies the conditions required.
+        \begin{enumerate}
+            \item Assumption of this theorem satisfies the first condition.
+            \item TODO
+            \item TODO
+        \end{enumerate}
+    \end{proof}
+
 \input{pseudocodes/td/sarsa.tex}
 \input{pseudocodes/td/qlearning.tex}
 \input{pseudocodes/td/expectedsarsa.tex}
