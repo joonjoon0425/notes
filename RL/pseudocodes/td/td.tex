@@ -66,10 +66,28 @@
         \begin{enumerate}
             \item Assumption of this theorem satisfies the first condition.
             \item Due to the Markov property, the noise term $\eta_T$ does not depend on the historical information $\mathcal{H}_t$.
-                Therefore, $\E[\eta_t(s)|\mathcal{H}_t]=\E[\eta_t(s)]$. For $s \neq s_t$, we have $\eta_t(s)=0$. For $s = s_t$, 
+                Therefore, $\E[\eta_t(s)|\mathcal{H}_t]=\E[\eta_t(s)]$. For $s \neq s_t$, we have $\eta_t(s)=0 \leq \gamma \|\Delta_t(s)\|_\infty$.
+                For $s = s_t$, we have
+                \begin{align}
+                    \E[\eta_t(s)] &= \E[\eta_t(s_t)] \\
+                                  &= \E[r_{t+1} + \gamma v_t(s_{t+1}) - v_\pi(s_t)|S_t=s_t] \\
+                                  &= \E[r_{t+1} + \gamma v_t(s_{t+1})|S_t=s_t] - v_\pi(s_t)
+                                  &= \gamma \E[v_t(s_{t+1}) - v_\pi(s_{t+1})|S_t=s_t] \\
+                                  &= \gamma \sum_{s' \in \mathcal{S}}p(s'|s_t)[v_t(s')-v_\pi(s')]
+                \end{align}
+                Applying $|\cdot|$ to both sides of equation, we get
+                \begin{align}
+                    |\E[\eta_t(s_t)]| &= \gamma \Big| \sum_{s' \in \mathcal{S}}p(s'|s_t)[v_t(s')-v_\pi(s')] \Big| \\
+                                      &\leq \gamma \sum_{s' \in \mathcal{S}}p(s'|s_t)\max_{s'\in\mathcal{S}}{|v_t(s')-v_\pi(s')|} \\
+                                      &= \gamma \max_{s' \in \mathcal{S}}{|v_t(s') - v_\pi(s')|} \\
+                                      &= \gamma \|v_t(s')-v_\pi(s')\|_\infty \\
+                                      &= \gamma \|\Delta_t(s)\|_\infty
+                \end{align}
             \item TODO
         \end{enumerate}
     \end{proof}
+    Note that this algorithm can only estimate the state value of current, given policy. This can be seen as the policy evaluation step of policy iteration method (Section \ref{sec:PolicyIteration}).
+    To find the optimal state values, we can add the policy improvement step here.
 
 \input{pseudocodes/td/sarsa.tex}
 \input{pseudocodes/td/qlearning.tex}

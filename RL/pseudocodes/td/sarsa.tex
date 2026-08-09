@@ -8,7 +8,7 @@
         Suppose we have trajectory generated from policy $\pi$: $(s_0,a_0,r_1,s_1,a_1,\dots,s_t,a_t,r_{t+1},s+{t+1},a_{t+1},\dots).$
         Note that the trajectory does not have to end. We use following TD-update every step for estimating the action values:
         \begin{align}
-            q_{t+1}(s_t,a_t) &= q_t(s_t,a_t) + \alpha_t(s_t,a_t)\Big[ r_{t+1} + \gamma q_t(s_{t+1},a_{t+1}) - q_t(s_t,a_t) \Big] \\
+            q_{t+1}(s_t,a_t) &= q_t(s_t,a_t) + \alpha_t(s_t,a_t)\Big[ r_{t+1} + \gamma q_t(s_{t+1},a_{t+1}) - q_t(s_t,a_t) \Big] \label{eq:SarsaUpdate}\\
             q_{t+1}(s,a) &= q_t(s,a),\text{ for all }(s,a) \neq (s_t,a_t)
         \end{align}    
 
@@ -66,7 +66,13 @@
         I usually intialize q value without minding if the state is terminal or not. While traning the agent, when the agent meets terminal state,
         I just check it in place and set the $q_t(s_{t+1},a_{t+1}) = 0$. Actually I don't even change the q value of terminal state to 0. I just leave it untouched.
     \subsection{Convergence}
-        TODO: Convergence of Sarsa
+        \begin{thm}{Convergence of Sarsa}{convSarsa}
+            Given a policy $\pi$, by the Sarsa algorithm \ref{eq:SarsaUpdate}, $q_t(s,a)$ converges almost surely to the action value $q_\pi(s,a)$ as $t \to \infty$ for all
+            $(s,a)$ if $\sum_t \alpha_t(s,a) = \infty$ and $\sum_t \alpha_t^2(s,a) < \infty$ for all $(s,a)$.
+        \end{thm}
+        \begin{proof}
+            TODO: organize the proof!
+        \end{proof}
     \subsection{Pros and Cons}
         Pros:
         \begin{itemize}

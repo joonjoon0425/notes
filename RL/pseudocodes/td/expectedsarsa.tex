@@ -1,1 +1,13 @@
 \section{Expected Sarsa} \label{sec:ExpectedSarsa}
+    \subsection{Main Idea}    
+        \textbf{Expected Sarsa} is very similar to Sarsa, but bootstraps the
+        next action values with the expectation of other action values, instead of choosing only one action.
+
+        \begin{align}
+            q_{t+1}(s_t,a_t) &= q_t(s_t,a_t) + \alpha_t(s_t,a_t)\Big[ r_{t+1} + \gamma \E[q_t(s_{t+1}, A)] - q_t(s_t,a_t) \Big] \label{eq:ExpectedSarsaUpdate}\\
+            q_{t+1}(s,a) &= q_t(s,a), \text{ for all } (s,a) \neq (s_t,a_t)
+        \end{align}
+
+        This decreases the variance of Sarsa.
+
+        
