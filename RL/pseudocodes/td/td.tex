@@ -65,7 +65,8 @@
         To prove this stochastic process converges almost surely to 0 with Theorem \ref{thm:DvoretzkyExtenstion}, we must show that this process statisfies the conditions required.
         \begin{enumerate}
             \item Assumption of this theorem satisfies the first condition.
-            \item TODO
+            \item Due to the Markov property, the noise term $\eta_T$ does not depend on the historical information $\mathcal{H}_t$.
+                Therefore, $\E[\eta_t(s)|\mathcal{H}_t]=\E[\eta_t(s)]$. For $s \neq s_t$, we have $\eta_t(s)=0$. For $s = s_t$, 
             \item TODO
         \end{enumerate}
     \end{proof}
