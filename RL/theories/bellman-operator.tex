@@ -39,7 +39,7 @@
     \begin{defn}{Generalized Bellman Equation}{GeneralizedBellmanEq}
         Let $v(s)$ be a state value function. Then, the \textbf{generalized Bellman equation} is defined as following:
         \begin{equation}
-            v(s) = \bigotimes_a \Big(r(s, a) + \gamma \bigoplus_{s'} v(s') \Big) 
+            v(s) = \bigotimes_a \Big(r(s, a) + \gamma \bigoplus_{s'}{}^a v(s') \Big) 
         \end{equation}
         where $\bigotimes$ defines how an optimal agent should choose actions, and $\bigoplus$ defines how the value of the next state should be used in assigning value to the current state.
 
@@ -55,7 +55,7 @@
     \end{defn}
     For a myopic policy to exist, we require that the operator $\bigotimes$ satisfy the following property: for all functions $f$ and states $s$,
     $\min_a f(s,a) \leq \bigotimes_a f(s,a) \leq \max_a f(s,a)$ (\cite{littman1996}).
-    And we will only use the operator $\Big[\bigotimes_{s'} v\Big](s) = \sum_{s' \in \mathcal{S}} p(s'|s,a) v(s')$, since we only cope with
+    And we will only use the operator $\Big[\bigoplus_{s'} v\Big]{}^a(s) = \sum_{s' \in \mathcal{S}} p(s'|s,a) v(s')$, since we only cope with
     MDPs.
 \section{Bellman Equation}
     The value function with respect to a policy $\pi$ satisfies the following Bellman equation.
@@ -92,7 +92,7 @@
         \end{equation}
     \end{thm}
 
-    And one can see the operator $\Big[\bigotimes_{s'} v\Big](s) = \sum_{s' \in \mathcal{S}} p(s'|s,a) v(s')$.
+    And one can see the operator $\Big[\bigotimes_{s'} v\Big]{}^a(s) = \sum_{s' \in \mathcal{S}} p(s'|s,a) v(s')$.
 
     \subsection{Matrix-Vector form of Bellman Equation}
         We can reformulate Bellman equation in terms of matrix-vector form. For this, we rewrite the Bellman equation given in Theorem \ref{thm:BellmanEq-SV} as
@@ -168,7 +168,7 @@
         \end{enumerate}
         Note that the Section \ref{sec:SolveBellmanOptEq} does not assume that the state-value function is optimal.
         \begin{defn}{Bellman Optimality Equation}{BellOptEq}
-            Let $\Pi$ be a set of possible policies and let $\gamma \in (0,1)$ be a discount rate. Then, the Bellman Optimality Equation is defined as
+            Let $\gamma \in (0,1)$ be a discount rate. Then, the Bellman Optimality Equation is defined as
             \begin{align}
                 v(s) &= \max_{a \in \mathcal{A}(s)}\left( r(s,a) + \gamma \sum_{s' \in \mathcal{S}}p(s'|s,a)v(s') \right) \\
                     &= \max_{a \in \mathcal{A}(s)} q(s,a)
@@ -287,51 +287,39 @@
     Now, we should prove that the solution of the Bellman optimality equation is really an optimal state-value function,
     and prove that the greedy policy derived from it is the optimal policy.
     \begin{thm}{Optimality of $v^*$ and $\pi^*$}{OptPolOptStateVal}
-        Let $v^*$ be the solution of BOE, and let $\pi^* = \arg\max_{\pi \in \Pi}(r_\pi + \gamma P_\pi v^*)$.
-        The, the $v^*$ is an optimal state vaule function, and the $\pi^*$ is an optimal policy. That is, for any policy $\pi$,
-        following holds;
-        \begin{equation}
-            v^* = v_{\pi^*} \geq v_\pi
-        \end{equation}
-        where $v_\pi$ is the state value function of $\pi$, and $\geq$ is applied elementwise.
-    \end{thm}
-    \begin{proof}
-        For any policy $\pi$, $v_\pi = r_\pi + \gamma P_\pi v_\pi$ holds (Bellman equation). Then,
-        \begin{align}
-            v^* &= \max_{\tau \in \Pi}(r_\tau + \gamma P_\tau v^*) \\
-                &= r_{\pi^*} + \gamma P_{\pi^*} v^* \\
-                &\geq r_\pi + \gamma P_\pi v^*
-        \end{align}
-        and we have
-        \begin{equation}
-            v^*-v_\pi \geq \gamma P_\pi(v^*-v_\pi).
-        \end{equation}
-        Using this inequality repeatedly, we have $v^*-v_\pi \geq \gamma^n P_\pi^n (v^*-v_\pi)$ for any $n \in \mathbb{N}$.
-        Since $\gamma \in (0,1)$ and $P_\pi$ is a nonnegative matrix with all its elements less than or equal to 1,
-        $\lim_{n \to \infty} \gamma^n P_\pi^n (v^*-v_\pi)=0$. That is, $v^*-v_\pi \geq \lim_{n \to \infty} \gamma^n P_\pi^n (v^*-v_\pi)=0$.
-    \end{proof}
-    The following theorem examines the optimal policy more precisely.
-    \begin{thm}{Greedy Optimal Policy}{GreedyOptPol}
-        For any $s \in \mathcal{S}$, the following deterministic policy is an optimal policy for solving the BOE.
-        \begin{equation}
-            \pi^*(a|s) = 
-            \begin{cases}
-                1, &a = \arg\max_a q^*(a,s) \\
-                0, &a \neq \arg\max_a q^*(a,s)
-            \end{cases}
-        \end{equation}
-        where $q^*(s,a) = \sum_{r \in \mathcal{R}}p(r|s,a)r + \gamma \sum_{s' \in \mathcal{S}}p(s'|s,a)v^*(s')$.
-    \end{thm}
-    \begin{proof}
-        From Theorem~\ref{thm:SolutionBellmanOptEq} and~\ref{defn:BellOptEq}, we see that
-        \begin{align}
-            v^*(s) &= \max_{\pi \in \Pi}\sum_{a \in \mathcal{A}}\pi(a|s)q^*(s,a) \\
-                        &\leq \left(\max_{\pi \in \Pi}\sum_{a \in \mathcal{A}}\pi(a|s)\right) \max_{a'} q^*(s,a') \label{tmpeq:2} \\
-                        &= \max_{a'}q^*(s,a')
-        \end{align}
-        and the given deterministic policy $\pi^*$ satisfies the equality of inequality~\ref{tmpeq:2}.
-    \end{proof}
-    The important truth is that the optimal state value is unique but the optimal policy is not. The Theorem~\ref{thm:GreedyOptPol}
+            Let $v^*$ be the solution of BOE $v=T^* v$, and let $\pi^*(a|s) = 1 \Leftrightarrow a \in \arg\max_{a'}q(s,a')$.
+            Then, $v^*$ is an optimal state vaule function, and $\pi^*$ is an optimal policy. That is, for any policy $\pi$,
+            following holds;
+            \begin{equation}
+                v^* = v_{\pi^*} \geq v_\pi
+            \end{equation}
+            where $v_\pi$ is the state value function of $\pi$, and $\geq$ is applied elementwise.
+        \end{thm}
+        \begin{proof}
+            \textit{Part 1.} We prove two lemmas.
+            First, $v_1 \leq v_2 \Rightarrow T v_1 \leq T v_2$ for $T=T^*_V \text{ or } T^\pi_V$ elementwise.
+            $r(s,a) + \gamma \sum_{s'} p(s'|s,a)v_1(s') \leq r(s,a) + \gamma \sum_{s'}p(s'|s,a)v_2(s')$ for all $(s,a)$ since $p(s'|s,a) \geq 0$ and $\gamma > 0$.
+            Then, 
+
+            Second, $\max_{\pi \in \Pi} \sum_{a \in \mathcal{A}(s)} \pi(a|s)q(s,a) = \max_{a \in \mathcal{A}(s)}q(s,a)$. Where 
+            \begin{align}
+                \sum_{a \in \mathcal{A}(s)} \pi(a|s)q(s,a) &\leq \sum_{a \in \mathcal{A}(s)} \pi(a|s) \max_{a'}{q(s,a')} \\
+                                                           &= \max_{a'}{q(s,a')}
+            \end{align}
+            and since $\mathcal{A}(s)$ is a finite set, there exists $a' \in \arg\max_a q(s,a)$. If we let $\pi(a'|s) = 1$ and 0 otherwise,
+            we get $\sum_{a \in \mathcal{A}(s)} \pi(a|s)q(s,a) = q(s,a') = \max_a q(s,a)$. Therefore, $\max_{\pi \in \Pi} \sum_{a \in \mathcal{A}(s)} \pi(a|s)q(s,a) = \max_{a \in \mathcal{A}(s)}q(s,a)$
+            and the deterministic policy $\pi$ satisfying the equation exists, which is the policy $\pi^*$. Then, $T^{\pi^*} v^* = T^* v^* = v^*$.
+            Since there exists a unique solution $v_{\pi^*}$ to the equation $T^{\pi^*} v =  v$, $v^* = v_{\pi^*}$.
+            
+            \textit{Part 2.} We show that $v^* \geq v_\pi$ for any policy $\pi$, elementwise. Using the first lemma of Part 1,
+            \begin{equation}
+                v^* = T^* v^* \geq T^\pi v^* \geq T^\pi T^\pi v^* \geq \dots \geq [T^\pi]^k v^*
+            \end{equation}
+            for all $k \in \mathbb{N}$, elementwise. Using the Theorem~\ref{thm:ContractMap}, we can see that $[T^\pi]^k v^* \to v_\pi$, as $k \to \infty$,
+            where $v_\pi$ is the solution of the Bellman equation $T^\pi v = v$. Therefore, $v^* \geq v_\pi$, and this means that $v^*$ is the optimal value function.
+        \end{proof}
+    
+    The important truth is that the optimal state value is unique but the optimal policy is not. The Theorem~\ref{thm:OptPolOptStateVal}
     only shows that there always exists at least one deterministic optimal policy. There still can be other optimal policies, too, stochastic or whatever.
 
 \section{Factors that Influence Optimal Policies}
