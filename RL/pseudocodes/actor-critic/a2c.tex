@@ -1,0 +1,93 @@
+\section{Advantage Actor-Critic (A2C)}
+    \subsection{Main Idea}
+        The core idea of A2C is to reduce the variance by introducing the baseline.
+        The following equation enable us to use the baseline when estimating state values.
+        \begin{equation}
+            \E_{S \sim \eta, A \sim \pi}[\nabla_\theta \log{\pi_\theta(A|S)}q_\pi(S,A)] = \E_{S \sim \eta, A \sim \pi}[\nabla_\theta\log{\pi_\theta(A|S)}(q_\pi(S,A)-b(S))]
+        \end{equation}
+        where $b(S)$ is a scalar function of $S$.
+        \begin{proof}
+            \begin{align}
+                \E_{S \sim \eta, A \sim \pi}\Big[ \nabla_\theta \log{\pi_\theta\log{\pi(A|S)}b(S)} \Big]
+                    &= \sum_{s \in \mathcal{S}} \eta(s) \sum_{a \in \mathcal{A}(s)}\pi_\theta(a|s)\nabla_\theta \log{\pi_\theta(a|s)}b(s) \\
+                    &= \sum_{s \in \mathcal{S}} \eta(s) \sum_{a \in \mathcal{A}(s)}\nabla_\theta \pi_\theta(a|s) b(s) \\
+                    &= \sum_{s \in \mathcal{S}} \eta(s)b(s) \sum_{a \in \mathcal{A}(s)} \nabla_\theta \pi_\theta(a|s) \\
+                    &= \sum_{s \in \mathcal{S}} \eta(s)b(s) \nabla_\theta \sum_{a \in \mathcal{A}(s)}\pi_\theta(a|s) \\
+                    &= \sum_{s \in \mathcal{S}} \eta(s)b(s) \nabla_\theta 1 = 0.
+            \end{align}
+        \end{proof}
+
+        The baseline reduces the variance of estimation of gradients. In particular, let
+        \begin{equation}
+            X(S,A) = \nabla_\theta \log{\pi_\theta(a|s)}[q_\pi(S,A)-b(S)]
+        \end{equation}
+        Then, the true gradient is $\E[X(S,A)]$ and we estimate it with samples $x \sim X$. To better estimate the gradient,
+        it would be favorable to make the variance of $X$ small. The theoretically optimal baseline that minimizes $\text{var}(X)$ is
+        \begin{equation}
+            b^*(s) = \frac{\E_{A \sim \pi}\big[ \|\nabla_\theta \log_\theta(A|s)\|^2 q_\pi(s,A) \big]}
+            {\E_{A \sim \pi}\big[ \|\nabla_\theta\log{\pi(A|s)}\|^2 \big]}
+        \end{equation}
+        proof can be found at \cite{Zhao2025}.
+        But it is too complex to be useful in practice. In practice, we use the suboptimal version without the logarithm term, which is actually a value function, intersetingly.
+        \begin{equation}
+            b(s) = \E_{A \sim \pi}[q_\pi(s,A)] = v_\pi(s)
+        \end{equation}
+
+    \subsection{Pseudocode}
+        \Algorithm{a2c}
+        {Advantage Actor-Critic Algorithm}
+        {
+            \inputitem{$\pi_\theta$}{a policy function with initial parameter $\theta_0$} \\
+            \inputitem{$v_w(s)$}{a value function with initial parameter $w_0$}
+        }
+        {
+            \inputitem{$\pi^*$}{(sub)optimal policy}
+        }
+        {
+            \ForEach{time step $t$} {
+                generate and take an action $a_t$ following $\pi_\theta$\;
+                observe $r_{t+1}$ and $s_{t+1}$.\;
+                \tcp{advantage}
+                $\delta_t \leftarrow r_{t+1} + \gamma v_{w_t}(s_{t+1}) - v_{w_t}(s_t)$\;
+                \tcp{actor (policy update)}
+                $\theta_{t + 1} \leftarrow \theta_t + \alpha_\theta \delta_t \nabla_\theta \log{\pi_{\theta_t}(a_t|s_t)}$\;
+                \tcp{critic (value update)}
+                $w_{t+1} \leftarrow w_t + \alpha_w \delta_t \nabla_w v_{w_t}(s_t)$\; 
+            }
+            \Return{$\pi$}
+        }
+        
+        Using the baseline $b(s) = v_\pi(s)$, we get the following update equation:
+        \begin{equation}
+            \theta_{t+1} = \theta_t + \alpha \nabla_\theta \log{\pi_{\theta_t}(a_t|s_t)}[q_t(s_t,a_t) - v(s_t)]
+        \end{equation}
+
+        If $q_t(s_t,a_t)$ and $v_t(s_t)$ were estimated by Monte Carlo, the algorithm is called \textbf{REINFORCE with a baseline}.
+        If estimated by TD learining, the algorithm~\ref{alg:a2c} is called \textbf{A2C} or \textbf{TD actor-critic}.
+        Note that algorithm~\ref{alg:a2c} estimates $q_t(s_t,a_t) - v_t(s_t)$ with TD error, which is $r_{t+1} + \gamma v_t(s_{t+1} - v_t(s_t))$.
+    
+    \subsection{Implementation Details}
+        We can use n-step update to balance between bias and variance of estimation.
+
+        To stop the policy from being almost deterministic too quickly, we can add \textbf{entrophy bonus} at the loss function (\cite{pmlr-v48-mniha16}, \cite{WILLIAMS1991}).
+        TODO: Study policy gradient theorems for better understanding on policy gradients.
+        where 
+        \begin{equation}
+            \mathcal{H}(\pi(\cdot|s)) = -\int \pi(a|s)\log{\pi(a|s)}da
+        \end{equation}
+        The discrete entrophy is then $\mathcal{H} = -\sum_a \pi(a|s)\log{\pi(a|s)}$.
+
+        The actor and critic can share parameters, when they are using the encoder. The can use different encoder, each of their own, or share one encoder.
+    \subsection{Pros and Cons}
+    Pros:
+    \begin{itemize}
+        \item Requires only one networks, opposed to QAC;
+        \item Variance is decreased, opposed to the original REINFORCE without baseline;
+        \item Appliable to both discrete and continuous actions;
+    \end{itemize}
+    Cons:
+    \begin{itemize}
+        \item If the baseline is incorrect, it can be biased;
+        \item Sample efficiency is low, since it is an on-policy method;
+        \item Vulnerable to big, sudden change of parameters. \textbf{PPO} was designed to resolve this;
+    \end{itemize}

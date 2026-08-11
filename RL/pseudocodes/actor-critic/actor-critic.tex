@@ -1,0 +1,38 @@
+\section{Introduction}
+    In this chapter, \textbf{actor-critic} algorithms are introduced. The actor refers to the policy
+    update step, and critic refers to the value update step. The actor-critic methods are kind of policy gradient methods,
+    with value function method mixed in. Instead of using the full return $G_t$ to compute the loss, which has big variance,
+    actor-critic uses value function for the estimate, and this value function is called \textbf{critic}.
+    \begin{equation}
+        \theta_{t+1} = \theta_t + \alpha \nabla_\theta \log{\pi(a_t|s_t,\theta_t)q_t(s_t,a_t)}
+    \end{equation}
+    \begin{itemize}
+        \item If $q_t(s_t,a_t)$ is estimated by the $G_t$, the corresponding algorithm is the REINFORCE~\ref{alg:reinforce}.
+        \item If $q_t(s_t,a_t)$ is estimated by using the TD algorithm, the corresponding algorithms are usually called \textbf{actor-critic}.
+    \end{itemize}
+
+    From here, the most simple actor-critic algorithm can be derived, the \textbf{Q actor-critic} algorithm.
+    We just use two networks, one for policy and one for value function.
+    
+    \Algorithm{qac}{QAC}
+    {
+        \inputitem{$\pi_\theta(a|s)$}{the policy function with initial parameter $\theta_0$} \\
+        \inputitem{$q(s, a, w)$}{the value function with initial parameter $w_0$}
+    }
+    {
+        \inputitem{$\pi^*$}{(sub)optimal policy}
+    }
+    {
+        pick an action $a_0$ following $\pi_{\theta_0}(a|s_0)$\;
+        \ForEach{time step $t$}
+        {
+            take $a_t$\;
+            observe $r_{t+1}$ and $s_{t+1}$, and then generate $a_{t+1}$ following $\pi_{\theta_t}(a|s_{t+1})$\;
+            \tcp{policy update (actor)}
+            $\theta_{t+1} \leftarrow \theta_t + \alpha_\theta \nabla_\theta \log{\pi_{\theta_t}(a_t|s_t)}q_{w_t}(s_t,a_t)$\;
+            \tcp{value update (critic)}
+            $w_{t+1} \leftarrow w_t + \alpha_w[r_{t+1} + \gamma q_{w_t}(s_{t+1},a_{t+1}) - q_{w_t}(s_t,a_t)]\nabla_w q_w(s_t,a_t)$\;
+        }
+        \Return{$\pi$}
+    }
+\input{pseudocodes/actor-critic/a2c.tex}
