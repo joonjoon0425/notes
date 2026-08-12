@@ -68,14 +68,21 @@
     
     \subsection{Implementation Details}
         We can use n-step update to balance between bias and variance of estimation.
-
-        To stop the policy from being almost deterministic too quickly, we can add \textbf{entrophy bonus} at the loss function (\cite{pmlr-v48-mniha16}, \cite{WILLIAMS1991}).
-        TODO: Study policy gradient theorems for better understanding on policy gradients.
-        where 
         \begin{equation}
-            \mathcal{H}(\pi(\cdot|s)) = -\int \pi(a|s)\log{\pi(a|s)}da
+            G_t^{(n)} = r_{t + 1} + \gamma r_{t+2} + \gamma^2 r_{t+3} + \dots + \gamma^n v_t(s_{n+1})
         \end{equation}
-        The discrete entrophy is then $\mathcal{H} = -\sum_a \pi(a|s)\log{\pi(a|s)}$.
+
+        To stop the policy from being almost deterministic too quickly, we can add \textbf{entropy bonus} at the loss function (\cite{pmlr-v48-mniha16}, \cite{WILLIAMS1991}).
+        Specifically, the loss function is
+        \begin{equation}
+            \mathcal{L} = \frac{1}{N}\sum_{i = 0}^{N-1} \Big[-\log{\pi_\theta(a_{t+i}|s_{t+i})}A_{t+i} + c_v(v_\phi(s_{t+i}) - G_{t+i})^2 - c_e \mathcal{H}(\pi_\theta(\cdot|s_{t+i}))\Big]
+        \end{equation}
+        where 
+        \begin{align}
+            \mathcal{H}(\pi(\cdot|s)) &= -\int \pi(a|s)\log{\pi(a|s)}da \\
+            \mathcal{H} &= -\sum_a \pi(a|s)\log{\pi(a|s)},
+        \end{align}
+        $A$ and $G$ are advantage and return estimate, respectively.
 
         The actor and critic can share parameters, when they are using the encoder. The can use different encoder, each of their own, or share one encoder.
     \subsection{Pros and Cons}

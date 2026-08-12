@@ -2,4 +2,53 @@
     \textbf{Policy gradient method}, unlike value-based methods, tries to predict the optimal policy itself,
     instead of solving the Bellman equation. It has many advantages over value-based methods;
     It is more efficient in handling large state-action spaces, and has stronger generalization abilities.
+\section{Metrics for Defining Optimal Policies}\label{sec:Metrics}
+    The value-based methods uses state value and action value to define the optimal policies.
+    New metrics for defining optimal polcies are required for policy gradient methods, since they does not use the state and action values.
+
+    There are two metrics given in \cite{Zhao2025}.
+    \begin{enumerate}
+        \item average state value: $\bar{v}_\pi = \sum_{s\in\mathcal{S}}d(s)v_\pi(s) = \E_{S \sim d}[v_\pi(S)]$ where $d(s)$ is the weight of state $s$;
+        \item average reward: $\bar{r}_\pi = \sum_{s\in\mathcal{S}}d_\pi(s)r_\pi(s) = \E_{S \sim d_\pi}[r_\pi(S)]$ where $d_\pi$ is the stationary distribution and $r_\pi(s) = \sum_{a \in \mathcal{A}}\pi(a|s,\theta)r(s,a)$.
+    \end{enumerate}
+    Actually the two metrics are equivalent in discounted case $\gamma < 1$. In particular, $\bar{r}_\pi = (1-\gamma)\bar{v}_\pi$. Proofs can be found at \cite{Zhao2025}.
+
+    \subsection{Average State Value}
+        Average state value has two equivalent expressions.
+        \begin{itemize}
+            \item Suppose the agent has collected rewards $\{R_{t+1}\}_{t=0}^\infty$. Then,
+            \begin{align}
+                \E[\sum_{t=0}^\infty \gamma^t R_{t+1}] &= \sum_{s \in \mathcal{S}}d(s)\E\left[\sum_{t=0}^\infty \gamma^t R_{t+1} \mid| S_0 = s\right] \\
+                                                       &= \sum_{s \in \mathcal{S}}d(s)v_\pi(s) \\
+                                                       &= \bar{v}_\pi
+            \end{align}
+            \item $\bar{v}_\pi$ can be rewritten as the inner product of two vectors, $v_\pi = [\dots,v_\pi(s),\dots]$ and $d = [\dots,d(s),\dots]$.
+                \begin{equation}
+                    \bar{v}_\pi = d^\top v_\pi
+                \end{equation}
+        \end{itemize}
+
+    \subsection{Average Reward}
+        Average reward has two equivalent expressions.
+        \begin{itemize}
+            \item Suppose the agent has collected rewards $\{R_{t+1}\}_{t=0}^\infty$. Then,
+                \begin{equation}
+                    \lim_{n \to \infty}\frac{1}{n}\E\left[ \sum_{t=0}^{n-1}R_{t+1} \right] = \bar{r}_\pi
+                \end{equation}
+                The proof can be found at \cite{Zhao2025}.
+            \item Same as before, $\bar{r}_\pi$ can be rewritten as the inner product of two vectors.
+        \end{itemize}
+
+\section{Policy Gradient Theorem}
+    The policy gradient method mainly depends on the \textbf{policy gradient theorem}.
+    \begin{thm}{Policy Gradient Theorem}{policyGrad}
+        Let $J(\theta)$ be one of the metrics proposed in Section~\ref{sec:Metrics}. Then, the gradiento of $J(\theta)$ is
+        \begin{equation}
+            \nabla_\theta J(\theta) = \sum_{s\in\mathcal{S}}\eta(s)\sum_{a\in\mathcal{A}(s)}\nabla_\theta \pi_\theta(a|s)q_{\pi_\theta}(s,a)
+        \end{equation}
+        where $\eta$ is a state distrubution. Moreover, the equivalent equation expressed in terms of expectation exists:
+        \begin{equation}
+            \nabla_\theta J(\theta) = \E_{S \sim \eta, A \sim \pi_\theta(\cdot|S)} \Big[ \nabla_\theta \log{\pi_\theta(a|s)}q_{\pi_\theta}(S,A) \Big]
+        \end{equation}
+    \end{thm}
 \input{pseudocodes/policy-based/REINFORCE.tex}
