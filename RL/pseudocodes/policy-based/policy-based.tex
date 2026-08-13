@@ -8,7 +8,7 @@
 
     There are two metrics given in \cite{Zhao2025}.
     \begin{enumerate}
-        \item average state value: $\bar{v}_\pi = \sum_{s\in\mathcal{S}}d(s)v_\pi(s) = \E_{S \sim d}[v_\pi(S)]$ where $d(s)$ is the weight of state $s$;
+        \item average state value: $\bar{v}_\pi = \sum_{s\in\mathcal{S}}d(s)v_\pi(s) = \E_{S \sim d}[v_\pi(S)]$ where $d(s)$ is the weight of state $s$. $d(s)$ can be independent of the policy $\pi$, denoted as $d_0(s)$ and $v_0$, or dependent, for example, stationary distribution.;
         \item average reward: $\bar{r}_\pi = \sum_{s\in\mathcal{S}}d_\pi(s)r_\pi(s) = \E_{S \sim d_\pi}[r_\pi(S)]$ where $d_\pi$ is the stationary distribution and $r_\pi(s) = \sum_{a \in \mathcal{A}}\pi(a|s,\theta)r(s,a)$.
     \end{enumerate}
     Actually the two metrics are equivalent in discounted case $\gamma < 1$. In particular, $\bar{r}_\pi = (1-\gamma)\bar{v}_\pi$. Proofs can be found at \cite{Zhao2025}.
@@ -51,4 +51,24 @@
             \nabla_\theta J(\theta) = \E_{S \sim \eta, A \sim \pi_\theta(\cdot|S)} \Big[ \nabla_\theta \log{\pi_\theta(a|s)}q_{\pi_\theta}(S,A) \Big]
         \end{equation}
     \end{thm}
+
+    \begin{lem}{Gradient of $v_\pi(s)$}{grad-valuefunction}
+        In the discounted case, the following holds for any $s \in \mathcal{S}$
+        \begin{equation}
+            \nabla_\theta v_{\pi_\theta}(s) = \sum_{s' \in \mathcal{S}}P_{\pi_\theta}(s'|s) \sum_{a \in \mathcal{A}(s')}\nabla_\theta \pi_\theta(a|s')q_{\pi_\theta}(s',a)
+        \end{equation}
+        where
+        \begin{equation}
+            P_{\pi_\theta}(s'|s) = \sum_{k=0}^\infty \gamma^k [P_{\pi_\theta}^k]_{ss'} = [(I_n - \gamma P_{\pi_\theta})^{-1}]_{ss'}
+        \end{equation}
+        is the discounted total probability of transitioning from $s$ to $s'$ under policy $\pi_\theta$. $[P_{\pi_\theta}^k]_{ss'}$ denotes the probability of transitioning from
+        $s$ to $s'$ using exactly $k$ steps under policy $\pi_\theta$.
+    \end{lem}
+    \begin{proof}
+        Try to naively differentiate $v_{\pi_\theta}(s) = \sum_{a \in \mathcal{A}(s)}\pi_\theta(a|s)q_\pi(s,a)$. Then, using the relationship between state value function and action value function,
+        you'll be able to derive another $v_{\pi_\theta}$ on the right-hand side. Like the derivation of vector form of Bellman equation, use matrix-vector form to solve the linear equation. For more information, see \cite{Zhao2025}.
+    \end{proof}
+
+    
+
 \input{pseudocodes/policy-based/REINFORCE.tex}
